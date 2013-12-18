@@ -16,8 +16,6 @@ class Plane(models.Model):
         return "%s %s到%s" % (self.number, self.starting, self.destination)
 
     number = models.CharField(u"航班号", max_length=const.DB_NORMAL_LENGTH, primary_key=True)
-    starting = models.CharField(u"出发地", max_length=const.DB_PLACE_LENGTH)
-    destination = models.CharField(u"目的地", max_length=const.DB_PLACE_LENGTH)
 
     company = models.CharField(u"公司名", max_length=const.DB_NORMAL_LENGTH, default=u"夏威夷航空")
     type = models.CharField(u"机型", max_length=const.DB_NORMAL_LENGTH)
@@ -32,6 +30,9 @@ class PlaneInventory(models.Model):
         return "%s %s" %(self.plane, self.arrival)
 
     plane = models.ForeignKey(Plane, verbose_name=u"飞机",)
+    starting = models.CharField(u"出发地", max_length=const.DB_PLACE_LENGTH)
+    destination = models.CharField(u"目的地", max_length=const.DB_PLACE_LENGTH)
+
     departure = models.DateTimeField(u"起飞时间")
     arrival = models.DateTimeField(u"到达时间")
     seat = models.IntegerField(u"库存数量", default=0)

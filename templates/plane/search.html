@@ -1,5 +1,40 @@
 {% extends "base.html" %}
 
 {% block title %}
-    这是标题
+    航班搜索
+{% endblock %}
+
+{% block header %}
+
+{% endblock %}
+
+{% block body %}
+    <form class="form-horizontal" role="form" action="/plane/search/" method="post">
+        <div class="form-group">
+            <label for="starting" class="col-sm-2 control-label"><span><i class="icon-plane"> 起飞地</i></span>
+</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="starting" placeholder="北京">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="destination" class="col-sm-2 control-label"><span><i class="icon-fighter-jet"> 目的地</i></span>
+            </label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="destination" placeholder="火奴鲁鲁">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="destination" class="col-sm-2 control-label"><span><i class="icon-calendar"> 出发时间</i></span>
+            </label>
+            <div class="col-sm-10">
+                <input type="date" class="form-control" id="destination" placeholder="请选择出发时间">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default">查询</button>
+            </div>
+        </div>
+    </form>
 {% endblock %}
