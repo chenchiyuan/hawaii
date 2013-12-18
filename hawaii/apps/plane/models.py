@@ -13,7 +13,7 @@ class Plane(models.Model):
         verbose_name = verbose_name_plural = u"机票"
 
     def __unicode__(self):
-        return "%s %s到%s" % (self.number, self.starting, self.destination)
+        return "%s %s %s" % (self.number, self.type, self.company)
 
     number = models.CharField(u"航班号", max_length=const.DB_NORMAL_LENGTH, primary_key=True)
 
@@ -44,3 +44,11 @@ class PlaneInventory(models.Model):
     amount_limit = models.IntegerField(u"起订人数", default=0)
     baggage_limit = models.CharField(u"行李限制", max_length=const.DB_NORMAL_LENGTH, default="20KG")
     limit = models.CharField(u"其他限制", max_length=const.DB_CONTENT_LENGTH, default="不能退票", blank=True)
+
+    @property
+    def format_departure(self):
+        return self.departure.strftime(const.TIME_FORMAT)
+
+    @property
+    def format_arrival(self):
+        return self.arrival.strftime(const.TIME_FORMAT)
