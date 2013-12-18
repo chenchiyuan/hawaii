@@ -25,3 +25,5 @@ static/*
 
 config/deploy_env.py
 .idea
+
+/migrations/*
