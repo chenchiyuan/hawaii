@@ -2,34 +2,40 @@
 # __author__ = chenchiyuan
 
 from __future__ import division, unicode_literals, print_function
-from models import Plane, PlaneInventory, PlanePrivilege
+from models import Flight, FlightInventory, FlightPrivilege, Day
 from django.contrib import admin
 
 
-class PlaneInventoryInline(admin.StackedInline):
-    model = PlaneInventory
-    extra = 1
-
-
-class PlanePrivilegeInline(admin.StackedInline):
-    model = PlanePrivilege
-    extra = 1
-
-
-class PlaneInventoryAdmin(admin.ModelAdmin):
+class DayAdmin(admin.ModelAdmin):
     pass
 
 
-class PlanePrivilegeAdmin(admin.ModelAdmin):
+class FlightInventoryInline(admin.StackedInline):
+    model = FlightInventory
+    extra = 1
+
+
+class FlightPrivilegeInline(admin.StackedInline):
+    model = FlightPrivilege
+    extra = 1
+
+
+class FlightPrivilegeAdmin(admin.ModelAdmin):
     pass
 
 
-class PlaneAdmin(admin.ModelAdmin):
+class FlightInventoryAdmin(admin.ModelAdmin):
+    #filter_horizontal = ("days", )
+    pass
+
+class FlightAdmin(admin.ModelAdmin):
     inlines = [
-        PlanePrivilegeInline,
-        PlaneInventoryInline,
+        FlightInventoryInline,
+        FlightPrivilegeInline,
     ]
 
-admin.site.register(PlanePrivilege, PlanePrivilegeAdmin)
-admin.site.register(Plane, PlaneAdmin)
-admin.site.register(PlaneInventory, PlaneInventoryAdmin)
+
+admin.site.register(Flight, FlightAdmin)
+admin.site.register(FlightInventory, FlightPrivilegeAdmin)
+admin.site.register(FlightPrivilege, FlightInventoryAdmin)
+admin.site.register(Day, DayAdmin)

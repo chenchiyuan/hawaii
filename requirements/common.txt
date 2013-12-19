@@ -19,3 +19,6 @@ MySQL-python
 
 # Extension
 ipython
+
+# Common
+requests
