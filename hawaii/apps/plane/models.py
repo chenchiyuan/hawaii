@@ -21,6 +21,19 @@ class Plane(models.Model):
     type = models.CharField(u"机型", max_length=const.DB_NORMAL_LENGTH)
 
 
+class PlanePrivilege(models.Model):
+    class Meta:
+        db_table = u'hawaii_plane_privilege'
+        verbose_name = verbose_name_plural = u"机票优惠"
+
+    def __unicode__(self):
+        return "%s: %s" %(self.plane, self.title)
+
+    plane = models.ForeignKey(Plane, verbose_name=u"飞机", related_name="privileges")
+    title = models.CharField(u"优惠标题", max_length=const.DB_TITLE_LENGTH)
+    description = models.CharField(u"优惠描述", max_length=const.DB_CONTENT_LENGTH, blank=True, default="")
+
+
 class PlaneInventory(models.Model):
     class Meta:
         db_table = u'hawaii_plane_inventory'
@@ -29,7 +42,7 @@ class PlaneInventory(models.Model):
     def __unicode__(self):
         return "%s %s" %(self.plane, self.arrival)
 
-    plane = models.ForeignKey(Plane, verbose_name=u"飞机",)
+    plane = models.ForeignKey(Plane, verbose_name=u"飞机", related_name="inventories")
     starting = models.CharField(u"出发地", max_length=const.DB_PLACE_LENGTH)
     destination = models.CharField(u"目的地", max_length=const.DB_PLACE_LENGTH)
 

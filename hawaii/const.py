@@ -6,6 +6,7 @@ from __future__ import division, unicode_literals, print_function
 # DB
 DB_NORMAL_LENGTH = 32
 DB_PLACE_LENGTH = 64
+DB_TITLE_LENGTH = 128
 
 DB_CONTENT_LENGTH = 2056
 

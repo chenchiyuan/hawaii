@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-    航班搜索
+    机票列表
 {% endblock %}
 
 {% block header %}
@@ -14,13 +14,17 @@
             <li class="list-unstyled" style="margin-bottom: 10px;">
                 <div class="plane container">
                     <div class="row">
-                        <div class="col-xs-6">{{ plane.format_departure }}-{{ plane.format_arrival }}</div>
-                        <div class="col-xs-6">{{ plane.starting }}-{{ plane.destination }}</div>
-                        <div class="col-xs-4">{{ plane.price }}</div>
-                        <div class="col-xs-4">{{ plane.type }}</div>
-                        <div class="col-xs-4">还剩{{ plane.seat }}张</div>
+                        <div class="col-xs-3">{{ plane.format_departure }}</div>
+                        <div class="col-xs-4">{{ plane.starting }}</div>
+                        <div class="col-xs-5">￥{{ plane.price }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-3">{{ plane.format_arrival }}</div>
+                        <div class="col-xs-4">{{ plane.destination }}</div>
+                        <div class="col-xs-5">还剩{{ plane.seat }}张</div>
                     </div>
                 </div>
+
             </li>
         {% endfor %}
     </ul>
