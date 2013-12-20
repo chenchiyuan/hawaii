@@ -41,3 +41,16 @@ def to_aware_datetime(value):
 
 def datetime_now():
     return now()
+
+
+def dates_during(from_date, to_date, weekdays=None):
+    if not weekdays:
+        return []
+
+    dates = []
+    delta_day = (to_date - from_date).days
+    for delta in range(1, delta_day+1):
+        date = from_date + timedelta(days=delta)
+        if date.weekday() + 1 in weekdays:
+            dates.append(date)
+    return dates
