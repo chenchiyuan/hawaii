@@ -28,6 +28,14 @@ class FlightInventoryAdmin(admin.ModelAdmin):
     filter_horizontal = ("days", )
     raw_id_fields = ("flight", )
 
+    list_display = ("seat", "inventory_type", "begin", "end", "show_days", "price", "child_price")
+
+    def show_days(self, obj):
+        days = obj.days.all().values_list("name", flat=True)
+        return ";".join(days)
+
+    show_days.short_description = u"有效日"
+
 
 class FlightAdmin(admin.ModelAdmin):
     inlines = [

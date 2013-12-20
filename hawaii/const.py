@@ -11,6 +11,7 @@ DB_TITLE_LENGTH = 128
 DB_CONTENT_LENGTH = 2056
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+DATE_FORMAT = "%Y-%m-%d"
 TIME_FORMAT = "%H:%M"
 
 URL_ID = "(?P<id>[0-9]+)"

@@ -6,6 +6,7 @@ from __future__ import division, unicode_literals, print_function
 from django.db import models
 from hawaii import const
 from libs.datetimes import dates_during
+from datetime import date
 
 
 class Flight(models.Model):
@@ -64,30 +65,6 @@ class FlightInventory(models.Model):
     begin = models.DateField(u"开始时间")
     end = models.DateField(u"结束时间")
     days = models.ManyToManyField(Day, verbose_name=u"周几", blank=True)
-
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
-        super_return = super(FlightInventory, self).save(force_insert, force_update, using, update_fields)
-        weekdays = Day.objects.all().values_list("number", flat=True)
-
-        dates = dates_during(from_date=self.begin, to_date=self.end, weekdays=weekdays)
-        copy_dates = dates[:]
-        products = list(self.products.all())
-        products_will_delete = []
-        for product in products:
-            if not product.date in copy_dates:
-                products_will_delete.append(product.id)
-            else:
-                index = dates.index(product.date)
-                dates.remove(index)
-
-        # delete products
-        FlightProduct.objects.filter(id__in=products_will_delete).delete()
-
-        # create products
-        FlightProduct.bulk_create_products(self, dates)
-
-        return super_return
 
 
 class FlightPrivilege(models.Model):

@@ -137,3 +137,7 @@ LOGGING = {
 INTERNAL_IPS = ['127.0.0.1']
 GRAPPELLI_INDEX_DASHBOARD = 'hawaii.dashboard.CustomIndexDashboard'
 GRAPPELLI_ADMIN_TITLE = u"夏威夷航空管理系统"
+
+
+from hawaii.apps.plane.signals import register_signals
+register_signals()
