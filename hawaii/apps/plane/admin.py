@@ -45,7 +45,9 @@ class FlightAdmin(admin.ModelAdmin):
 
 
 class FlightProductAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("company", "number", "starting", "destination", "departure", "arrival",
+                    "seat", "price", "child_price",
+                    "model", "inventory_type", "baggage_limit", "limit")
 
 
 admin.site.register(Flight, FlightAdmin)

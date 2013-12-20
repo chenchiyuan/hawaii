@@ -5,8 +5,8 @@ from __future__ import division, unicode_literals, print_function
 
 from django.db import models
 from hawaii import const
-from libs.datetimes import dates_during
-from datetime import date
+from libs.datetimes import to_aware_datetime, get_weekday
+from datetime import datetime
 
 
 class Flight(models.Model):
@@ -86,7 +86,7 @@ class FlightProduct(models.Model):
         verbose_name = verbose_name_plural = u"航班产品"
 
     def __unicode__(self):
-        return "%s: %s %s %s" % (self.number, self.date, self.departure, self.arrival)
+        return "%s: %s %s" % (self.number, self.departure, self.arrival)
 
     inventory = models.ForeignKey(FlightInventory, verbose_name=u"库存", editable=False, related_name="products")
 
@@ -96,9 +96,8 @@ class FlightProduct(models.Model):
     starting = models.CharField(u"出发地", max_length=const.DB_PLACE_LENGTH)
     destination = models.CharField(u"目的地", max_length=const.DB_PLACE_LENGTH)
 
-    date = models.DateField(u"起飞日期")
-    departure = models.TimeField(u"起飞时间")
-    arrival = models.TimeField(u"到达时间")
+    departure = models.DateTimeField(u"起飞时间")
+    arrival = models.DateTimeField(u"到达时间")
 
     plus = models.BooleanField(verbose_name=u"是否+1", default=False)
 
@@ -112,10 +111,22 @@ class FlightProduct(models.Model):
     baggage_limit = models.CharField(u"行李限制", max_length=const.DB_NORMAL_LENGTH, default="20KG")
     limit = models.CharField(u"其他限制", max_length=const.DB_CONTENT_LENGTH, default="不能退票", blank=True)
 
+    @property
+    def html(self):
+        return "%s %s到%s 时间: %s %s" % (self.number, self.starting, self.destination, self.departure, self.arrival)
+
+    @property
+    def departure_format(self):
+        weekday = get_weekday(self.departure)
+        format_departure = self.departure.strftime("%Y-%m-%d %H:%M")
+        return "%s %s" % (format_departure, weekday)
+
     @classmethod
     def bulk_create_products(cls, inventory, dates):
         objects = []
         for date in dates:
+            departure = to_aware_datetime(datetime.combine(date, inventory.flight.departure))
+            arrival = to_aware_datetime(datetime.combine(date, inventory.flight.arrival))
             product = cls(
                 inventory=inventory,
                 number=inventory.flight.number,
@@ -123,9 +134,8 @@ class FlightProduct(models.Model):
                 model=inventory.flight.model,
                 starting=inventory.flight.starting,
                 destination=inventory.flight.destination,
-                date=date,
-                departure=inventory.flight.departure,
-                arrival=inventory.flight.arrival,
+                departure=departure,
+                arrival=arrival,
                 plus=inventory.flight.plus,
                 seat=inventory.seat,
                 inventory_type=inventory.inventory_type,

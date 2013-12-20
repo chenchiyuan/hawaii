@@ -9,5 +9,5 @@ from views import PlaneSearchView, PlaneFormView, PlaneConfirmView
 urlpatterns = patterns('',
     url(r'^form/$', PlaneFormView.as_view(), name="plane_form_view"),
     url(r'^search/$', PlaneSearchView.as_view(), name="plane_search_view"),
-    url(r'^%s/confirm/$' % const.URL_ID, PlaneConfirmView.as_view(), name="place_confirm_view"),
+    url(r'^products/%s/confirm/$' % const.URL_ID, PlaneConfirmView.as_view(), name="place_confirm_view"),
 )

@@ -54,3 +54,8 @@ def dates_during(from_date, to_date, weekdays=None):
         if date.weekday() + 1 in weekdays:
             dates.append(date)
     return dates
+
+
+def get_weekday(datetime):
+    days = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+    return days[datetime.weekday()]

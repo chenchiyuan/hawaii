@@ -9,25 +9,32 @@
 {% endblock %}
 
 {% block body %}
-    <ul>
-        {% for plane in planes %}
-            <li class="list-unstyled" style="margin-bottom: 10px;">
+    <ul style="margin-top: 30px">
+        {% for product in products %}
+            <li class="list-unstyled" style="margin-bottom: 30px;">
                 <div class="plane container">
                     <div class="row">
-                        <div class="col-xs-12">{{ plane.format_departure }}<span><i class="icon-fighter-jet"></i></span>{{ plane.format_arrival }}</div>
+                        <div class="col-xs-12 text-center" style="color:#000000;">{{ product.departure_format }} {{ product.starting }}-{{ product.destination }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-xs-3">{{ plane.format_departure }}</div>
-                        <div class="col-xs-4">{{ plane.starting }}</div>
-                        <div class="col-xs-5">￥{{ plane.price }}</div>
+                        <div class="col-xs-12 text-center" style="color:#999999;">{{ product.company }} {{ product.number }} {{ prodcut.model }}|{{ product.inventory_type }}</div>
                     </div>
                     <div class="row">
-                        <div class="col-xs-3">{{ plane.format_arrival }}</div>
-                        <div class="col-xs-4">{{ plane.destination }}</div>
-                        <div class="col-xs-5">还剩{{ plane.seat }}张</div>
+                        <div class="col-xs-12 text-center" style="font-size:20px;color:#000000;">{{ product.departure|time:"H:i" }} - {{ product.arrival|time:"H:i" }} {% if product.plus %} +1 {% else %}{% endif %}</div>
                     </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">成人票:{{ product.price }}/人 儿童票:{{ product.child_price }}/人</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">行李额:{{ product.baggage_limit }} 其他限制:{{ product.limit }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center" style="margin-top: 10px;">
+                            <a href="{% url 'place_confirm_view' product.id %}" class="btn btn-info active" role="button">预定</a>
+                        </div>
+                    </div>
+                    <hr>
                 </div>
-
             </li>
         {% endfor %}
     </ul>

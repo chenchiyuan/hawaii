@@ -2,7 +2,7 @@
 # __author__ = chenchiyuan
 
 from __future__ import division, unicode_literals, print_function
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import m2m_changed
 
 def flight_inventory_changed(sender, instance, *args, **kwargs):
     from libs.datetimes import dates_during
@@ -16,7 +16,7 @@ def flight_inventory_changed(sender, instance, *args, **kwargs):
     products = list(inventory.products.all())
     products_will_delete = []
     for product in products:
-        if not product.date in copy_dates:
+        if not product.departure.date in copy_dates:
             products_will_delete.append(product.id)
         else:
             dates.remove(product.date)
