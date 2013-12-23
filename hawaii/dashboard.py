@@ -4,7 +4,6 @@
 from __future__ import division, unicode_literals, print_function
 
 from grappelli.dashboard import modules, Dashboard
-from grappelli.dashboard.utils import get_admin_site_name
 
 
 class CustomIndexDashboard(Dashboard):
@@ -12,6 +11,19 @@ class CustomIndexDashboard(Dashboard):
 
     def init_with_context(self, context):
         site_name = u"夏威夷"
+
+        self.children.append(modules.ModelList(
+            u"微信管理",
+            column=1,
+            collapsible=True,
+            models=(
+                'hawaii.apps.weixin.models.apps.App',
+                'hawaii.apps.weixin.models.rules.Rule',
+                'hawaii.apps.weixin.models.photos.Photo',
+                'hawaii.apps.weixin.models.photos.RichText'
+            )
+        ))
+
         self.children.append(modules.ModelList(
             u"机票管理",
             column=1,

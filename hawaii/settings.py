@@ -12,6 +12,7 @@ DEBUG = config.getboolean("django", "debug")
 TEMPLATE_DEBUG = config.getboolean("django", "template_dubug")
 
 ALLOWED_HOSTS = json.loads(config.get("django", "allowed_hosts"))
+APP_HOST_NAME = config.get("django", "app_host_name")
 
 ADMINS = (
     ('Shadow', 'chenchiyuan03@gmail.com'),
@@ -104,6 +105,7 @@ INSTALLED_APPS = (
 
     # apps
     'hawaii.apps.plane',
+    'hawaii.apps.weixin',
     'django.contrib.admin',
     'django.contrib.admindocs',
 
@@ -138,6 +140,10 @@ INTERNAL_IPS = ['127.0.0.1']
 GRAPPELLI_INDEX_DASHBOARD = 'hawaii.dashboard.CustomIndexDashboard'
 GRAPPELLI_ADMIN_TITLE = u"夏威夷航空管理系统"
 
+UPYUN_BUCKET = config.get("upyun", "UPYUN_BUCKET")
+UPYUN_USER = config.get("upyun", "UPYUN_USER")
+UPYUN_PASS = config.get("upyun", "UPYUN_PASS")
+IMG_HOST = config.get("upyun", "IMG_HOST")
 
 from hawaii.apps.plane.signals import register_signals
 register_signals()

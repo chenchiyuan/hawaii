@@ -22,3 +22,8 @@ ipython
 
 # Common
 requests
+
+django-singletons
+upyun
+DjangoUeditor
+beautifulsoup4
