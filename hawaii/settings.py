@@ -140,6 +140,7 @@ LOGGING = {
 INTERNAL_IPS = ['127.0.0.1']
 GRAPPELLI_INDEX_DASHBOARD = 'hawaii.dashboard.CustomIndexDashboard'
 GRAPPELLI_ADMIN_TITLE = u"夏威夷航空管理系统"
+IMG_AVAILABLE_HOSTS = ['zoneke-img.b0.upaiyun.com', ]
 
 UPYUN_BUCKET = config.get("upyun", "UPYUN_BUCKET")
 UPYUN_USER = config.get("upyun", "UPYUN_USER")

@@ -10,7 +10,6 @@ from libs.models.models import SingletonModel
 from django.db import models
 
 
-
 class SubscribeItem(SingletonModel, QuerysetMixin):
     class Meta:
         app_label = "weixin"

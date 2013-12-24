@@ -3,7 +3,6 @@
 
 from __future__ import division, unicode_literals, print_function
 from django.db import models
-from hawaii.apps.weixin.models.apps import App
 from libs.models.mixins import QuerysetMixin
 
 
@@ -13,7 +12,6 @@ class Rule(models.Model, QuerysetMixin):
         db_table = "weixin_rule"
         verbose_name = verbose_name_plural = "关键字"
 
-    app = models.ForeignKey(App, verbose_name=u"App")
     text = models.CharField(u"关键字", max_length=64)
     response = models.TextField(u"文字回复", max_length=1024, blank=True, null=True,
                                 help_text="如果有关联的图文消息，则不显示该段文字。",)

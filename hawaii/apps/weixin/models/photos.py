@@ -60,9 +60,6 @@ class Photo(models.Model, QuerysetMixin):
         return self.image.storage.read(self.filename)
 
     def save(self, force_insert=False, force_update=False, using=None):
-        if not self.owner:
-            self.owner_id = 1
-
         content = self.image.read()
         if not content:
             raise Exception("No Image Content")
@@ -70,7 +67,7 @@ class Photo(models.Model, QuerysetMixin):
         md5_sign = md5(content)
         self.md5 = md5_sign
 
-        exists_item = Photo.get_by_queries(owner_id=self.owner_id, md5=self.md5)
+        exists_item = Photo.get_by_queries(md5=self.md5)
         if exists_item:
             self = exists_item
 
@@ -150,7 +147,7 @@ class RichText(models.Model, QuerysetMixin):
     def save(self, force_insert=False, force_update=False, using=None):
         if self.html:
             try:
-                self.html = BasicFormatter.format(self.html, owner_id=self.owner_id)
+                self.html = BasicFormatter.format(self.html)
             except:
                 pass
         super(RichText, self).save(force_insert, force_update, using)
