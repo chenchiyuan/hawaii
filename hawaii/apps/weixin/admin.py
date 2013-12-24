@@ -24,8 +24,10 @@ class PhotoAdmin(admin.ModelAdmin):
 
 
 class RichTextAdmin(admin.ModelAdmin):
-    pass
-
+    class Media:
+        css = {
+            "all": ("/static/css/admin-override.css", ),
+        }
 
 class RuleAdmin(admin.ModelAdmin):
     pass
@@ -36,6 +38,7 @@ class AppAdmin(admin.ModelAdmin):
         SubscribeInline,
         MenuInline
     ]
+    readonly_fields = ['app_url', 'app_token']
 
 
 admin.site.register(App, AppAdmin)

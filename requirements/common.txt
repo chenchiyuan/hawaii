@@ -25,5 +25,7 @@ requests
 
 django-singletons
 upyun
-DjangoUeditor
 beautifulsoup4
+
+# github
+git+git://github.com/chenchiyuan/DjangoUeditor.git
