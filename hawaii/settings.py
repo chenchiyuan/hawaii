@@ -22,12 +22,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'hawaii',                      # Or path to database file if using sqlite3.
-        'USER': 'shadow',                      # Not used with sqlite3.
-        'PASSWORD': '900303',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': config.get("db", "engine"),
+        'NAME': config.get("db", "db_name"),
+        'USER': config.get("db", "username"),
+        'PASSWORD': config.get("db", "password"),
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -109,32 +109,50 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
 
-
+    'raven.contrib.django.raven_compat',
     'south',
 )
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
+    'disable_existing_loggers': True,
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['sentry'],
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
     },
     'handlers': {
-        'mail_admins': {
+        'sentry': {
             'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
         }
     },
     'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
+        'django.db.backends': {
             'level': 'ERROR',
-            'propagate': True,
+            'handlers': ['console'],
+            'propagate': False,
         },
-    }
+        'raven': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+    },
 }
 
 INTERNAL_IPS = ['127.0.0.1']
@@ -153,6 +171,11 @@ WX_MANGER_STATES = {
     "NO_CACHE": "hawaii.apps.weixin.states.NoCacheState",
     "MENU": "hawaii.apps.weixin.states.MenuEventState",
     "SUBSCRIBE": "hawaii.apps.weixin.states.SubscribeEventState",
+}
+
+#raven
+RAVEN_CONFIG = {
+    'dsn': config.get("sentry", "dsn"),
 }
 
 
