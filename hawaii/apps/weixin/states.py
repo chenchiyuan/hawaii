@@ -10,12 +10,10 @@ from hawaii.apps.weixin.weixin.interface import StateInterface
 class NoCacheState(StateInterface):
     def __init__(self, *args, **kwargs):
         super(NoCacheState, self).__init__(*args, **kwargs)
-        self.account = self.get_account()
 
     def get_context(self):
-        account = self.account
         return {
-            "token": account.token,
+            "from": "weixin"
         }
 
     def next(self, input):
