@@ -12,7 +12,7 @@ from datetime import datetime
 class Flight(models.Model):
     class Meta:
         db_table = u'hawaii_flight'
-        verbose_name = verbose_name_plural = u"航班"
+        verbose_name = verbose_name_plural = u"航班管理"
 
     def __unicode__(self):
         return "%s %s %s" % (self.number, self.model, self.company)
@@ -46,7 +46,7 @@ class Day(models.Model):
 class FlightInventory(models.Model):
     class Meta:
         db_table = u'hawaii_plane_inventory'
-        verbose_name = verbose_name_plural = u"机票库存"
+        verbose_name = verbose_name_plural = u"价格和库存管理"
 
     def __unicode__(self):
         return "%s" % (self.flight)
@@ -83,7 +83,7 @@ class FlightPrivilege(models.Model):
 class FlightProduct(models.Model):
     class Meta:
         db_table = u'hawaii_plane_product'
-        verbose_name = verbose_name_plural = u"航班产品"
+        verbose_name = verbose_name_plural = u"所有航班产品"
 
     def __unicode__(self):
         return "%s: %s %s" % (self.number, self.departure, self.arrival)
