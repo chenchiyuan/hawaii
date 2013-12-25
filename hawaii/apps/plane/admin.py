@@ -50,5 +50,5 @@ class FlightProductAdmin(admin.ModelAdmin):
 admin.site.register(Flight, FlightAdmin)
 admin.site.register(FlightInventory, FlightInventoryAdmin)
 #admin.site.register(FlightPrivilege, FlightPrivilegeAdmin)
-admin.site.register(Day, DayAdmin)
+#admin.site.register(Day, DayAdmin)
 admin.site.register(FlightProduct, FlightProductAdmin)
