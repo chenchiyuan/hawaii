@@ -36,7 +36,7 @@ class App(SingletonModel):
             return subscribe[0].rule
 
     def get_app_url(self):
-        return "%s/wx/callback/" % settings.APP_HOST_NAME
+        return "%s/weixin/callback/" % settings.APP_HOST_NAME
 
     def save(self, force_insert=False, force_update=False, using=None):
         if force_insert and force_update:

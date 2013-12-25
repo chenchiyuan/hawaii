@@ -20,8 +20,8 @@ class Rule(models.Model, QuerysetMixin):
         return self.text
 
     @classmethod
-    def get_rule(cls, owner, text):
-        rule = cls.get_by_queries(**{"owner": owner, "text": text})
+    def get_rule(cls, text):
+        rule = cls.get_by_queries(**{"text": text})
         return rule
 
     def to_articles(self):

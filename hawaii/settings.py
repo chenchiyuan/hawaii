@@ -147,5 +147,14 @@ UPYUN_USER = config.get("upyun", "UPYUN_USER")
 UPYUN_PASS = config.get("upyun", "UPYUN_PASS")
 IMG_HOST = config.get("upyun", "IMG_HOST")
 
+
+# WEIXIN
+WX_MANGER_STATES = {
+    "NO_CACHE": "hawaii.apps.weixin.states.NoCacheState",
+    "MENU": "hawaii.apps.weixin.states.MenuEventState",
+    "SUBSCRIBE": "hawaii.apps.weixin.states.SubscribeEventState",
+}
+
+
 from hawaii.apps.plane.signals import register_signals
 register_signals()
