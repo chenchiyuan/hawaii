@@ -17,6 +17,6 @@ class SingletonModel(models.Model):
     def delete(self, *args, **kwargs):
         pass
 
-    @property
-    def model(self):
-        return self.__class__.objects.get(id=1)
+    @classmethod
+    def only_one(cls):
+        return cls.objects.get(id=1)

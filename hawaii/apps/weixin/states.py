@@ -42,7 +42,7 @@ class MenuEventState(NoCacheState):
 
 class SubscribeEventState(NoCacheState):
     def to_xml(self, input):
-        app = App.model
+        app = App.only_one()
         rule = app.subscribe_rule
         if not rule:
             return self._to_wx_text("")
