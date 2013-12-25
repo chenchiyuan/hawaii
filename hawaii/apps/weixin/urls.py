@@ -3,7 +3,8 @@
 
 from __future__ import division, unicode_literals, print_function
 from django.conf.urls import patterns, url
+from hawaii.apps.weixin.views import WeiXinResponseView
 
 urlpatterns = patterns('',
-    url(r'^callback/$', PlaneFormView.as_view(), name="plane_form_view"),
+    url(r'^callback/$', WeiXinResponseView.as_view(), name="weixin_response_view"),
 )

@@ -23,10 +23,10 @@ ipython
 # Common
 requests
 
-django-singletons
 upyun
 beautifulsoup4
 bleach
+Pillow
 
 # github
 git+git://github.com/chenchiyuan/DjangoUeditor.git

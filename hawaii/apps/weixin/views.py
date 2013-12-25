@@ -9,7 +9,7 @@ from django.views.generic import View
 from hawaii.apps.weixin.weixin.receiver import WeiXinReceiver
 
 
-class RuleResponseView(View):
+class WeiXinResponseView(View):
     def get(self, request, *args, **kwargs):
         receiver = WeiXinReceiver(request)
         return HttpResponse(receiver.echo())
@@ -20,4 +20,4 @@ class RuleResponseView(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(RuleResponseView, self).dispatch(request, *args, **kwargs)
+        return super(WeiXinResponseView, self).dispatch(request, *args, **kwargs)
