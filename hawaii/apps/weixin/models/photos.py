@@ -108,7 +108,7 @@ class RichText(models.Model, QuerysetMixin):
     def smart_link(self):
         if self.link:
             return self.link
-        return "%s/texts/%s/" % (settings.APP_HOST_NAME, self.id)
+        return "%s/weixin/texts/%s/" % (settings.APP_HOST_NAME, self.id)
 
 
     @property

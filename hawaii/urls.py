@@ -13,7 +13,6 @@ urlpatterns = patterns('',
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^ueditor/', include('DjangoUeditor.urls')),
     url(r'^plane/', include('hawaii.apps.plane.urls')),
     url(r'^weixin/', include('hawaii.apps.weixin.urls')),
 )
