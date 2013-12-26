@@ -4,10 +4,10 @@
 from __future__ import division, unicode_literals, print_function
 from django.core.files.base import ContentFile
 from django.db import models
+from hawaii.apps.ueditor.fields import UEditorField
 from hawaii.apps.weixin.libs.formatters import BasicFormatter
 from hawaii.apps.weixin.models.rules import Rule
 from libs.hashs import md5
-from libs.models.fields import UeEditorField
 from libs.models.mixins import QuerysetMixin
 from django.conf import settings
 from libs.models.storages import UpyunStorage
@@ -79,6 +79,8 @@ class Photo(models.Model, QuerysetMixin):
         super(Photo, self).save(force_insert, force_update, using)
 
 
+
+
 class RichText(models.Model, QuerysetMixin):
     class Meta:
         app_label = "weixin"
@@ -97,7 +99,7 @@ class RichText(models.Model, QuerysetMixin):
     priority = models.IntegerField(u"优先级", default=0, blank=True, null=True,
                                    help_text=u"数字越大，显示越靠前", )
 
-    html = UeEditorField(u"正文", height=700, width=600, default="", blank=True, null=True, imagePath="ues/")
+    html = UEditorField(u"正文", default="", blank=True, null=True)
 
     def __unicode__(self):
         return self.title

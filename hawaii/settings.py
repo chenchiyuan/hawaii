@@ -102,8 +102,8 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'grappelli.dashboard',
     'grappelli',
-    'DjangoUeditor',
     # apps
+    'hawaii.apps.ueditor',
     'hawaii.apps.plane',
     'hawaii.apps.weixin',
     'django.contrib.admin',
