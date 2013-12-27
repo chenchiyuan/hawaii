@@ -6,7 +6,7 @@ from models import Hotel, HotelInventory, HotelDay, HotelPrivilege, HotelProduct
 from django.contrib import admin
 
 
-class DayAdmin(admin.ModelAdmin):
+class HotelDayAdmin(admin.ModelAdmin):
     pass
 
 
@@ -41,3 +41,4 @@ class HotelProductAdmin(admin.ModelAdmin):
 admin.site.register(Hotel, HotelAdmin)
 admin.site.register(HotelInventory, HotelInventoryAdmin)
 admin.site.register(HotelProduct, HotelProductAdmin)
+admin.site.register(HotelDay, HotelDayAdmin)

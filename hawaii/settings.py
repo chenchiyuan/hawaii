@@ -180,5 +180,8 @@ RAVEN_CONFIG = {
 }
 
 
-from hawaii.apps.plane.signals import register_signals
-register_signals()
+from hawaii.apps.plane.signals import register_flight_signals
+from hawaii.apps.hotel.signals import register_hotel_signals
+
+register_flight_signals()
+register_hotel_signals()

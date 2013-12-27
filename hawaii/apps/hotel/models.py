@@ -77,7 +77,7 @@ class HotelProduct(models.Model):
         verbose_name = verbose_name_plural = u"所有酒店产品"
 
     def __unicode__(self):
-        return "%s: %s %s" % (self.number, self.departure, self.arrival)
+        return "%s: %s %s" % (self.name, self.city, self.check_in_time)
 
     inventory = models.ForeignKey(HotelInventory, verbose_name=u"库存", editable=False, related_name="products")
     name = models.CharField(u"酒店名", max_length=const.DB_NORMAL_LENGTH)
@@ -111,7 +111,6 @@ class HotelProduct(models.Model):
                 amount=inventory.amount,
                 inventory_type=inventory.inventory_type,
                 price=inventory.price,
-                child_price=inventory.child_price,
                 days_limit=inventory.days_limit,
                 amount_limit=inventory.amount_limit,
                 breakfast=inventory.breakfast,

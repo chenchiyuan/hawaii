@@ -4,6 +4,7 @@
 from __future__ import division, unicode_literals, print_function
 from django.db.models.signals import m2m_changed
 
+
 def flight_inventory_changed(sender, instance, *args, **kwargs):
     from libs.datetimes import dates_during
     from hawaii.apps.plane.models import FlightProduct, FlightInventory
@@ -33,6 +34,6 @@ def register_flight_inventory_changed():
     m2m_changed.connect(flight_inventory_changed, sender=FlightInventory.days.through, dispatch_uid='flight_inventory_changed')
 
 
-def register_signals():
+def register_flight_signals():
     register_flight_inventory_changed()
-    print("signal register")
+    print("plane signal register")
