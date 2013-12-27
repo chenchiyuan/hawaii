@@ -43,6 +43,5 @@ class CustomIndexDashboard(Dashboard):
                 'hawaii.apps.hotel.models.Hotel',
                 'hawaii.apps.hotel.models.HotelInventory',
                 'hawaii.apps.hotel.models.HotelProduct',
-                'hawaii.apps.hotel.models.HotelDay',
             ),
         ))
