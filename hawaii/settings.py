@@ -107,6 +107,8 @@ INSTALLED_APPS = (
     'hawaii.apps.plane',
     'hawaii.apps.weixin',
     'hawaii.apps.hotel',
+    'hawaii.apps.commodity',
+
     'django.contrib.admin',
     'django.contrib.admindocs',
 
@@ -182,6 +184,8 @@ RAVEN_CONFIG = {
 
 from hawaii.apps.plane.signals import register_flight_signals
 from hawaii.apps.hotel.signals import register_hotel_signals
+from hawaii.apps.commodity.signals import register_commodity_signals
 
 register_flight_signals()
 register_hotel_signals()
+register_commodity_signals()

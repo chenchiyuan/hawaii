@@ -45,3 +45,15 @@ class CustomIndexDashboard(Dashboard):
                 'hawaii.apps.hotel.models.HotelProduct',
             ),
         ))
+
+        self.children.append(modules.ModelList(
+            u"目的地商品管理",
+            column=2,
+            collapsible=True,
+            models=(
+                'hawaii.apps.commodity.models.Commodity',
+                'hawaii.apps.commodity.models.CommodityInventory',
+                'hawaii.apps.commodity.models.CommodityProduct',
+                'hawaii.apps.commodity.models.CommodityDay',
+            ),
+        ))
