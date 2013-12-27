@@ -8,6 +8,12 @@ from django.utils.safestring import mark_safe
 
 
 class UeditorWidget(Textarea):
+
+    class Media:
+        css = {
+            "all": ('static/ueditor/themes/iframe.css'),
+        }
+
     def __init__(self, attrs=None):
         default_attrs = {'width': '800', 'height': '600'}
         if attrs:
