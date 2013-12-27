@@ -54,6 +54,5 @@ class CustomIndexDashboard(Dashboard):
                 'hawaii.apps.commodity.models.Commodity',
                 'hawaii.apps.commodity.models.CommodityInventory',
                 'hawaii.apps.commodity.models.CommodityProduct',
-                'hawaii.apps.commodity.models.CommodityDay',
             ),
         ))
