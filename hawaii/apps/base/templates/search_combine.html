@@ -117,11 +117,20 @@
                             <td style="border-top:none">{{ flight.number }} - {{ flight.company }}</td>
                         </tr>
                         <tr class="row">
-                            <td style="border-top:none">{{ flight.from_city }} - {{ flight.to_city }}</td>
+                            <td style="border-top:none">{{ flight.starting }} - {{ flight.destination }}</td>
                         </tr>
                     </table>
                 </td>
-                <td class="col-xs-1">{{ route.price }}</td>
+                <td class="col-xs-1">
+                    <table class="table-condensed">
+                        <tr class="row">
+                            <td style="border-top:none;font:26px;font-weight:bold;">{{ route.price }}</td>
+                        </tr>
+                        <tr class="row">
+                            <td style="border-top:none">+{{ route.tax }}</td>
+                        </tr>
+                    </table>
+                </td>
                 <td class="col-xs-1"><input type="checkbox" ng-model="route.selected"/></td>
             </tr>
         </table>

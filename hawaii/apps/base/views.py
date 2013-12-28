@@ -8,6 +8,7 @@ from django.views.generic import TemplateView, View
 from libs.http import json_response
 from hawaii.apps.hotel.models import HotelProduct
 from hawaii.apps.commodity.models import CommodityProduct
+from hawaii.apps.plane.services import Route
 
 
 class SearchProductsView(TemplateView):
@@ -20,53 +21,33 @@ class SearchFormView(TemplateView):
 
 class SearchQueryView(View):
     def get(self, request, *args, **kwargs):
-        routes = [
-            {
-                "number": "CA123",
-                "inventory_type": u"经济舱",
-                "price": "1500",
-                "flights": [
-                    {
-                        "departure": "12:20",
-                        "arrival": "12:40",
-                        "from_city": "北京",
-                        "to_city": "上海",
-                        "company": "夏威夷航空",
-                        "number": "CA123"
-                    },
-                    {
-                        "departure": "12:20",
-                        "arrival": "12:40",
-                        "from_city": "北京",
-                        "to_city": "上海",
-                        "company": "夏威夷航空",
-                        "number": "CA123"
-                    }
-                ],
-            },
-            {
-                "number": "XX345",
-                "inventory_type": u"商务舱",
-                "price": "1500",
-                "flights": [
-                    {
-                        "departure": "12:20",
-                        "arrival": "12:40",
-                        "from_city": "北京",
-                        "to_city": "上海",
-                        "company": "夏威夷航空",
-                        "number": "CA123"
-                    },
-                ],
-            }
-        ]
+        query_dict = self.get_route_query_dict(request, *args, **kwargs)
+        routes = Route.search(**query_dict)
         hotels = map(lambda hotel: hotel.to_json(), list(HotelProduct.objects.all()))
         commodities = map(lambda commodity: commodity.to_json(), list(CommodityProduct.objects.all()))
         return json_response({
             "hotels": hotels,
             "commodities": commodities,
-            "routes": routes
+            "routes": map(lambda route: route.to_json(), routes)
         })
+
+    def get_route_query_dict(self, request, *args, **kwargs):
+        starting = request.GET.get("starting", "")
+        destination = request.GET.get("destination", "")
+        departure = request.GET.get("departure", "")
+        back_time = request.GET.get("back_time", "")
+        seat_type = request.GET.get("seat_type", "")
+        amount = request.GET.get("amount", 1)
+        query_dict = {
+            "starting": starting,
+            "destination": destination,
+            "departure": departure,
+            "back_time": back_time,
+            "seat_type": seat_type,
+            "amount": amount
+        }
+        return query_dict
+
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
