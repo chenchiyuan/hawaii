@@ -21,14 +21,17 @@ class SearchFormView(TemplateView):
 
 class SearchQueryView(View):
     def get(self, request, *args, **kwargs):
+        page_size = 3
+
         query_dict = self.get_route_query_dict(request, *args, **kwargs)
-        routes = Route.search(**query_dict)
+        routes_search = Route.search(**query_dict)
         hotels = map(lambda hotel: hotel.to_json(), list(HotelProduct.objects.all()))
         commodities = map(lambda commodity: commodity.to_json(), list(CommodityProduct.objects.all()))
+        routes = map(lambda route: route.to_json(), routes_search)
         return json_response({
-            "hotels": hotels,
-            "commodities": commodities,
-            "routes": map(lambda route: route.to_json(), routes)
+            "hotels": hotels[:page_size],
+            "commodities": commodities[:page_size],
+            "routes": routes[:page_size]
         })
 
     def get_route_query_dict(self, request, *args, **kwargs):
