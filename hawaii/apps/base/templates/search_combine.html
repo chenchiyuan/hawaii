@@ -11,7 +11,7 @@
             var querystring = location.href.substring(location.href.indexOf("?")+1);
             var request = $http({
                 method: 'GET',
-                url: 'http://127.0.0.1:8888/search/' + "?" + querystring
+                url: '/search/' + "?" + querystring
             });
 
             request.success(function(response, status, headers, config){
