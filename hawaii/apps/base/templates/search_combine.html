@@ -1,0 +1,167 @@
+<!doctype html>
+{% verbatim %}
+<html ng-app lang="zh-cn">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="http://cdn.staticfile.org/angular.js/1.2.5/angular.min.js"></script>
+    <script >
+        function SearchController($scope, $http) {
+            var querystring = location.href.substring(location.href.indexOf("?")+1);
+            var request = $http({
+                method: 'GET',
+                url: 'http://127.0.0.1:8888/search/' + "?" + querystring
+            });
+
+            request.success(function(response, status, headers, config){
+                $scope.routes = response.routes;
+                $scope.hotels = response.hotels;
+                $scope.commodities = response.commodities;
+            });
+
+
+            $scope.getUrl = function(){
+                var base_url = "http://baidu.com";
+                var hotels = [];
+                var commodities = [];
+                angular.forEach($scope.hotels, function(hotel){
+                   if(hotel.selected){
+                       hotels.push(hotel);
+                   }
+                });
+                if(typeof hotels !== 'undefined' && hotels.length > 0){
+                    return "http://baidu.com";
+                }else{
+                    return "http://google.com";
+                }
+            };
+        }
+
+    </script>
+    <style type="text/css">
+        .selected-true {
+            text-decoration: line-through;
+            color: grey;
+        }
+        .body {
+            margin-bottom: 60px;
+        }
+        .fixed-footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #3fbc48;
+            font-size: 1.2em;
+            text-align: center;
+            padding: 15px 0;
+            height: 60px;
+        }
+        .fixed-footer a {
+            text-decoration: none;
+            color: #fff;
+
+        }
+        a:link{
+            text-decoration: none;
+            color: #fff;
+
+        }
+
+        a:hover{
+            text-decoration: none;
+            color: #fff;
+        }
+
+        a:visited {
+            text-decoration: none;
+        }
+
+        .fixed-footer span {
+            display: block;
+            color: #fff;
+            font-size: 1.2em;
+        }
+
+        .routes thead>tr>th, .routes tbody>tr>th, .routes tfoot>tr>th, .routes thead>tr>td, .routes tbody>tr>td, .routes tfoot>tr>td {
+            vertical-align: middle;
+        }
+    </style>
+    <script>
+        function submit(){
+            hotel_scope = angular.element(document.getElementById('hotel-controller')).scope();
+            console.log(hotel_scope.hotels);
+            alert(hotel_scope.hotels);
+        }
+    </script>
+</head>
+<body>
+<div class="data-wrapper" ng-controller="SearchController" id="search-controller">
+     <div class="products-wrapper container">
+        <h3>航班</h3>
+        <table class="table table-hover routes">
+            <tr class="row" ng-class="{true:'success', false:''}[route.selected]" ng-repeat="route in routes">
+                <td class="col-xs-4">
+                    <table class="table-condensed" ng-repeat="flight in route.flights">
+                        <tr class="row">
+                            <td style="border-top:none">出发:{{ flight.departure }}</td>
+                        </tr>
+                        <tr class="row">
+                            <td style="border-top:none">到达:{{ flight.arrival }}</td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="col-xs-6">
+                    <table class="table-condensed" ng-repeat="flight in route.flights">
+                        <tr class="row">
+                            <td style="border-top:none">{{ flight.number }} - {{ flight.company }}</td>
+                        </tr>
+                        <tr class="row">
+                            <td style="border-top:none">{{ flight.from_city }} - {{ flight.to_city }}</td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="col-xs-1">{{ route.price }}</td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="route.selected"/></td>
+            </tr>
+        </table>
+    </div>
+    <div class="products-wrapper container">
+        <h3>酒店</h3>
+        <table class="table table-hover">
+            <tr class="row">
+                <td class="col-xs-5">酒店名</td>
+                <td class="col-xs-3">类型</td>
+                <td class="col-xs-3">价格</td>
+                <td class="col-xs-1"></td>
+            </tr>
+            <tr class="row" ng-class="{true:'success', false:''}[hotel.selected]" ng-repeat="hotel in hotels">
+                <td class="col-xs-5">{{ hotel.name }}</td>
+                <td class="col-xs-3">{{ hotel.inventory_type }}</td>
+                <td class="col-xs-3">{{ hotel.price }}</td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="hotel.selected"/></td>
+            </tr>
+        </table>
+    </div>
+    <div class="products-wrapper container">
+        <h3>目的地产品</h3>
+        <table class="table table-hover">
+            <tr class="row">
+                <td class="col-xs-5">产品名</td>
+                <td class="col-xs-3">类型</td>
+                <td class="col-xs-3">价格</td>
+                <td class="col-xs-1"></td>
+            </tr>
+            <tr class="row" ng-class="{true:'success', false:''}[commodity.selected]" ng-repeat="commodity in commodities">
+                <td class="col-xs-5">{{ commodity.name }}</td>
+                <td class="col-xs-3">{{ commodity.inventory_type }}</td>
+                <td class="col-xs-3">{{ commodity.price }}</td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="commodity.selected"/></td>
+            </tr>
+        </table>
+    </div>
+    <div><a class="fixed-footer" id="submit-products" href="{{getUrl()}}"><span>提交</span></a></div>
+</div>
+</body>
+</html>
+{% endverbatim %}

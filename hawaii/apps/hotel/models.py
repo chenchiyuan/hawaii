@@ -119,3 +119,13 @@ class HotelProduct(models.Model):
             )
             objects.append(product)
         cls.objects.bulk_create(objects)
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "city": self.city,
+            "inventory_type": self.inventory_type,
+            "price": self.price,
+            "breakfast": self.breakfast,
+            "remark": self.remark
+        }

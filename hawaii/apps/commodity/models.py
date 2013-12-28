@@ -116,3 +116,13 @@ class CommodityProduct(models.Model):
             )
             objects.append(product)
         cls.objects.bulk_create(objects)
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "city": self.city,
+            "inventory_type": self.inventory_type,
+            "price": self.price,
+            "child_price": self.child_price,
+            "remark": self.remark,
+        }

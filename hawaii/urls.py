@@ -9,6 +9,7 @@ from django.conf import settings
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    url(r'^', include('hawaii.apps.base.urls')),
     url(r'^editor/', include('hawaii.apps.ueditor.urls')),
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

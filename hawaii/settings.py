@@ -108,6 +108,7 @@ INSTALLED_APPS = (
     'hawaii.apps.weixin',
     'hawaii.apps.hotel',
     'hawaii.apps.commodity',
+    'hawaii.apps.base',
 
     'django.contrib.admin',
     'django.contrib.admindocs',
