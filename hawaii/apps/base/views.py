@@ -8,7 +8,7 @@ from django.views.generic import TemplateView, View
 from libs.http import json_response
 from hawaii.apps.hotel.models import HotelProduct
 from hawaii.apps.commodity.models import CommodityProduct
-from hawaii.apps.plane.services import Route
+from hawaii.apps.plane.services import Route, City
 
 
 class SearchProductsView(TemplateView):
@@ -24,9 +24,16 @@ class SearchQueryView(View):
         page_size = 3
 
         query_dict = self.get_route_query_dict(request, *args, **kwargs)
+        city = City.get_name(query_dict.get("destination", ""))
         routes_search = Route.search(**query_dict)
-        hotels = map(lambda hotel: hotel.to_json(), list(HotelProduct.objects.all()))
-        commodities = map(lambda commodity: commodity.to_json(), list(CommodityProduct.objects.all()))
+        if not city:
+            hotels = []
+            commodities = []
+        else:
+            hotels = map(lambda hotel: hotel.to_json(),
+                         list(HotelProduct.objects.filter(city=city)))
+            commodities = map(lambda commodity: commodity.to_json(),
+                              list(CommodityProduct.objects.filter(city=city)))
         routes = map(lambda route: route.to_json(), routes_search)
         return json_response({
             "hotels": hotels[:page_size],
