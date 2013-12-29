@@ -26,9 +26,9 @@
                 var hotels = [];
                 var commodities = [];
                 angular.forEach($scope.hotels, function(hotel){
-                   if(hotel.selected){
-                       hotels.push(hotel);
-                   }
+                    if(hotel.selected){
+                        hotels.push(hotel);
+                    }
                 });
                 if(typeof hotels !== 'undefined' && hotels.length > 0){
                     return "http://baidu.com";
@@ -97,43 +97,58 @@
 </head>
 <body>
 <div class="data-wrapper" ng-controller="SearchController" id="search-controller">
-     <div class="products-wrapper container">
-        <h3>航班</h3>
-        <table class="table table-hover routes">
-            <tr class="row" ng-class="{true:'success', false:''}[route.selected]" ng-repeat="route in routes">
-                <td class="col-xs-4">
-                    <table class="table-condensed" ng-repeat="flight in route.flights">
-                        <tr class="row">
-                            <td style="border-top:none">{{ flight.departure }}</td>
-                        </tr>
-                        <tr class="row">
-                            <td style="border-top:none">{{ flight.arrival }}</td>
-                        </tr>
-                    </table>
-                </td>
-                <td class="col-xs-6">
-                    <table class="table-condensed" ng-repeat="flight in route.flights">
-                        <tr class="row">
-                            <td style="border-top:none">{{ flight.number }} - {{ flight.company }}</td>
-                        </tr>
-                        <tr class="row">
-                            <td style="border-top:none">{{ flight.starting }} - {{ flight.destination }}</td>
-                        </tr>
-                    </table>
-                </td>
-                <td class="col-xs-1">
-                    <table class="table-condensed">
-                        <tr class="row">
-                            <td style="border-top:none;font:26px;font-weight:bold;">{{ route.price }}</td>
-                        </tr>
-                        <tr class="row">
-                            <td style="border-top:none">+{{ route.tax }}</td>
-                        </tr>
-                    </table>
-                </td>
-                <td class="col-xs-1"><input type="checkbox" ng-model="route.selected"/></td>
-            </tr>
-        </table>
+    <div class="products-wrapper container">
+        <ul>
+            <h3>航班</h3>
+            <li class="list-unstyled">
+                <table class="table table-hover routes" ng-repeat="route in routes">
+                    <tr class="row" ng-class="{true:'success', false:''}[route.selected]">
+                        <td class="col-xs-4">
+                            <table class="table-condensed" ng-repeat="flight in route.flights">
+                                <tr class="row">
+                                    <td style="border-top:none">{{ flight.departure }}</td>
+                                </tr>
+                                <tr class="row">
+                                    <td style="border-top:none">{{ flight.arrival }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="col-xs-6">
+                            <table class="table-condensed" ng-repeat="flight in route.flights">
+                                <tr class="row">
+                                    <td style="border-top:none">{{ flight.number }} - {{ flight.company }}</td>
+                                </tr>
+                                <tr class="row">
+                                    <td style="border-top:none">{{ flight.starting }} - {{ flight.destination }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="col-xs-1">
+                            <table class="table-condensed">
+                                <tr class="row">
+                                    <td style="border-top:none;font:26px;font-weight:bold;">{{ route.price }}</td>
+                                </tr>
+                                <tr class="row">
+                                    <td style="border-top:none">+{{ route.tax }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="col-xs-1"><input type="checkbox" ng-model="route.selected"/></td>
+                    </tr>
+                    <tr class="row">
+                        <td ng-show="route.selected" colspan="4">
+                            <div class="container">
+                                <div class="row" ng-repeat="flight in route.flights">
+                                    <p>{{ flight.departure }}到{{ flight.arrival }}</p>
+                                    
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </li>
+        </ul>
+
     </div>
     <div class="products-wrapper container">
         <h3>酒店</h3>

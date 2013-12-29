@@ -25,7 +25,7 @@ class SearchQueryView(View):
 
         query_dict = self.get_route_query_dict(request, *args, **kwargs)
         city = City.get_name(query_dict.get("destination", ""))
-        routes_search = Route.search(**query_dict)
+        #routes_search = Route.search(**query_dict)
         if not city:
             hotels = []
             commodities = []
@@ -34,7 +34,48 @@ class SearchQueryView(View):
                          list(HotelProduct.objects.filter(city=city)))
             commodities = map(lambda commodity: commodity.to_json(),
                               list(CommodityProduct.objects.filter(city=city)))
-        routes = map(lambda route: route.to_json(), routes_search)
+        #routes = map(lambda route: route.to_json(), routes_search)
+        routes = [
+            {
+            "price": "3080",
+            "tax": "4249",
+            "flights": [{
+            "arrival": "15:15",
+            "company": "荷兰航空",
+            "destination": "阿姆斯特丹",
+            "number": "KL898",
+            "departure": "11:55",
+            "amount": 1,
+            "starting": "北京"
+            },{
+            "arrival": "22:25",
+            "company": "荷兰航空",
+            "destination": "法兰克福",
+            "number": "KL1775",
+            "departure": "21:05",
+            "amount": 1,
+            "starting": "阿姆斯特丹"
+            }]},
+                        {
+            "price": "3080",
+            "tax": "4249",
+            "flights": [{
+            "arrival": "15:15",
+            "company": "荷兰航空",
+            "destination": "阿姆斯特丹",
+            "number": "KL898",
+            "departure": "11:55",
+            "amount": 1,
+            "starting": "北京"
+            },{
+            "arrival": "22:25",
+            "company": "荷兰航空",
+            "destination": "法兰克福",
+            "number": "KL1775",
+            "departure": "21:05",
+            "amount": 1,
+            "starting": "阿姆斯特丹"
+            }]}]
         return json_response({
             "hotels": hotels[:page_size],
             "commodities": commodities[:page_size],
