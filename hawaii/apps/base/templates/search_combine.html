@@ -8,6 +8,7 @@
     <script src="http://cdn.staticfile.org/angular.js/1.2.5/angular.min.js"></script>
     <script >
         function SearchController($scope, $http) {
+            $scope.loadded = false;
             var querystring = location.href.substring(location.href.indexOf("?")+1);
             var request = $http({
                 method: 'GET',
@@ -18,6 +19,7 @@
                 $scope.routes = response.routes;
                 $scope.hotels = response.hotels;
                 $scope.commodities = response.commodities;
+                $scope.loadded = true;
             });
 
 
@@ -40,11 +42,7 @@
 
     </script>
     <style type="text/css">
-        .selected-true {
-            text-decoration: line-through;
-            color: grey;
-        }
-        .body {
+        body {
             margin-bottom: 60px;
         }
         .fixed-footer {
@@ -87,6 +85,82 @@
             vertical-align: middle;
         }
     </style>
+    <style type="text/css">
+        .m-spin {
+            z-index: 2;
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -75px;
+            margin-top: -75px;
+        }
+        .m-spin .u-spin {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -50px;
+            margin-top: -50px;
+            -webkit-animation-name: rotateThis;
+            -webkit-animation-duration: 2s;
+            -webkit-animation-iteration-count: infinite;
+            -webkit-animation-timing-function: linear;
+        }
+        .m-spin .u-spin div {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #FFF;
+            -webkit-border-radius: 40px;
+            left: 40px;
+            top: 40px;
+        }
+        .m-spin .u-spin .bar1 {
+            -webkit-transform: rotate(0deg) translate(0, -40px);
+            opacity: .12;
+        }
+        .m-spin .u-spin .bar2 {
+            -webkit-transform: rotate(45deg) translate(0, -40px);
+            opacity: .25;
+        }
+        .m-spin .u-spin .bar3 {
+            -webkit-transform: rotate(90deg) translate(0, -40px);
+            opacity: .37;
+        }
+        .m-spin .u-spin .bar4 {
+            -webkit-transform: rotate(135deg) translate(0, -40px);
+            opacity: .5;
+        }
+        .m-spin .u-spin .bar5 {
+            -webkit-transform: rotate(180deg) translate(0, -40px);
+            opacity: .62;
+        }
+        .m-spin .u-spin .bar6 {
+            -webkit-transform: rotate(225deg) translate(0, -40px);
+            opacity: .75;
+        }
+        .m-spin .u-spin .bar7 {
+            -webkit-transform: rotate(270deg) translate(0, -40px);
+            opacity: .87;
+        }
+        .m-spin .u-spin .bar8 {
+            -webkit-transform: rotate(315deg) translate(0, -40px);
+            opacity: 1;
+        }
+        @-webkit-keyframes rotateThis {
+            from {
+                -webkit-transform: scale(0.5) rotate(0deg);
+            }
+            to {
+                -webkit-transform: scale(0.5) rotate(360deg);
+            }
+        }
+    </style>
     <script>
         function submit(){
             hotel_scope = angular.element(document.getElementById('hotel-controller')).scope();
@@ -97,60 +171,61 @@
 </head>
 <body>
 <div class="data-wrapper" ng-controller="SearchController" id="search-controller">
-    <div class="products-wrapper container">
-        <ul>
-            <h3>航班</h3>
-            <li class="list-unstyled">
-                <table class="table table-hover routes" ng-repeat="route in routes">
-                    <tr class="row" ng-class="{true:'success', false:''}[route.selected]">
-                        <td class="col-xs-4">
-                            <table class="table-condensed" ng-repeat="flight in route.flights">
-                                <tr class="row">
-                                    <td style="border-top:none">{{ flight.departure }}</td>
-                                </tr>
-                                <tr class="row">
-                                    <td style="border-top:none">{{ flight.arrival }}</td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td class="col-xs-6">
-                            <table class="table-condensed" ng-repeat="flight in route.flights">
-                                <tr class="row">
-                                    <td style="border-top:none">{{ flight.number }} - {{ flight.company }}</td>
-                                </tr>
-                                <tr class="row">
-                                    <td style="border-top:none">{{ flight.starting }} - {{ flight.destination }}</td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td class="col-xs-1">
-                            <table class="table-condensed">
-                                <tr class="row">
-                                    <td style="border-top:none;font:26px;font-weight:bold;">{{ route.price }}</td>
-                                </tr>
-                                <tr class="row">
-                                    <td style="border-top:none">+{{ route.tax }}</td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td class="col-xs-1"><input type="checkbox" ng-model="route.selected"/></td>
-                    </tr>
-                    <tr class="row">
-                        <td ng-show="route.selected" colspan="4">
-                            <div class="container">
-                                <div class="row" ng-repeat="flight in route.flights">
-                                    <p>{{ flight.departure }}到{{ flight.arrival }}</p>
-
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </li>
-        </ul>
+    <div class="m-spin" ng-if = "!loadded">
+      <div class="u-spin">
+          <div class="bar1"></div>
+          <div class="bar2"></div>
+          <div class="bar3"></div>
+          <div class="bar4"></div>
+          <div class="bar5"></div>
+          <div class="bar6"></div>
+          <div class="bar7"></div>
+          <div class="bar8"></div>
+      </div>
+    </div>
+    <div class="products-wrapper container" ng-show="loadded">
+        <h3>航班</h3>
+        <table class="table table-hover routes" ng-repeat="route in routes">
+            <tr class="row" ng-class="{true:'success', false:''}[route.selected]">
+                <td class="col-xs-2">
+                    {{ route.starting }}
+                </td>
+                <td class="col-xs-4">
+                    {{ route.departure|date:'HH:mm' }} - {{ route.arrival|date:'HH:mm' }}
+                </td>
+                <td class="col-xs-5">
+                    ￥{{ route.price }}+{{ route.tax }}
+                </td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="route.selected"/></td>
+            </tr>
+            <tr class="row">
+                <td ng-show="route.selected" colspan="4">
+                    <div class="container">
+                        <table class="table" ng-repeat="flight in route.flights">
+                            <tr class="row">
+                                <td class="col-xs-6">航空公司: {{ flight.company }}</td>
+                                <td class="col-xs-6">航班号: {{ flight.number }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">机型: {{ flight.modal }}</td>
+                                <td class="col-xs-6">飞行时间: {{ flight.duration }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">起飞机场: {{ flight.starting }}</td>
+                                <td class="col-xs-6">抵达机场: {{ flight.destination }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">起飞时间: {{ flight.departure|date:'yyyy-MM-dd HH:mm' }}</td>
+                                <td class="col-xs-6">抵达时间: {{ flight.arrival|date:'yyyy-MM-dd HH:mm' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
     </div>
-    <div class="products-wrapper container">
+    <div class="products-wrapper container" ng-show="loadded">
         <h3>酒店</h3>
         <table class="table table-hover">
             <tr class="row">
@@ -167,7 +242,7 @@
             </tr>
         </table>
     </div>
-    <div class="products-wrapper container">
+    <div class="products-wrapper container" ng-show="loadded">
         <h3>目的地产品</h3>
         <table class="table table-hover">
             <tr class="row">

@@ -3,6 +3,8 @@
 
 from __future__ import division, unicode_literals, print_function
 from bs4 import BeautifulSoup
+import time
+import datetime
 import requests
 
 
@@ -893,7 +895,12 @@ u'OS': u'毛利航空',
 
 
 class Route(object):
-    def __init__(self, price, tax, flights=[]):
+    def __init__(self, company, starting, destination, price, tax, flights=[]):
+        self.company = company
+        self.starting = starting
+        self.destination = destination
+        self.departure = flights[0].departure
+        self.arrival = flights[-1].arrival
         self.price = price
         self.tax = tax
         self.flights = flights
@@ -911,12 +918,16 @@ class Route(object):
             params['returnDate'] = back_time
 
         url = base_url + "?" + "&".join(map(lambda item: "%s=%s" % (item[0], item[1]), params.items()))
-        print(url)
         content = requests.get(url).content
         return cls.parse_xml(content)
 
     def to_json(self):
         return {
+            "company": self.company,
+            "starting": self.starting,
+            "destination": self.destination,
+            "departure": self.departure,
+            "arrival": self.arrival,
             "price": self.price,
             "tax": self.tax,
             "flights": map(lambda flight: flight.to_json(), self.flights)
@@ -931,44 +942,61 @@ class Route(object):
             route_segments = route.find_all("s")
             price = route.find("pm").text
             tax = route.find("x").text
+            route_starting = City.get_name(route.find("f").text)
+            route_destination = City.get_name(route.find("t").text)
+            route_company = Company.get_name(route.find("a").text)
+
             flights = []
             for route_segment in route_segments:
                 number = route_segment.find("no")
                 from_city = City.get_name(route_segment.find("f").text)
                 to_city = City.get_name(route_segment.find("t").text)
                 company = Company.get_name(route_segment.find("a").text)
-                departure_date = route_segment.find("fd")
+                departure_date = route_segment.find("fd").text
                 departure_time = route_segment.find("ft").text
                 arrival_date = route_segment.find("td")
+                if not arrival_date:
+                    arrival_date = departure_date
+                else:
+                    arrival_date = arrival_date.text
+
                 arrival_time = route_segment.find("tt").text
                 seat_type = route_segment.find("st")
                 flight_price = route_segment.find("m")
+                duration = route_segment.find("d").text
+                modal = route_segment.find("et").text
 
                 flight_data = {
                     "number": number.text,
                     "staring": from_city,
                     "destination": to_city,
                     "company": company,
-                    "departure": "%s:%s" % (departure_time[:2], departure_time[2:]),
-                    "arrival": "%s:%s" % (arrival_time[:2], arrival_time[2:]),
+                    "departure": "%s %s:%s" % (departure_date, departure_time[:2], departure_time[2:]),
+                    "arrival": "%s %s:%s" % (arrival_date, arrival_time[:2], arrival_time[2:]),
+                    "duration": duration,
+                    "modal": modal
                 }
                 flight = Flight(**flight_data)
                 flights.append(flight)
-            route = Route(price=price, tax=tax, flights=flights)
+            route = Route(route_company, route_starting,
+                          route_destination, price=price,
+                          tax=tax, flights=flights)
             result_routes.append(route)
 
         return result_routes
 
 
 class Flight(object):
-    def __init__(self, number, staring, destination, company, departure, arrival, amount=1):
+    def __init__(self, number, staring, destination, company, departure, arrival, duration, modal, amount=1, **kwargs):
         self.number = number
         self.starting = staring
         self.destination = destination
         self.company = company
-        self.departure = departure
-        self.arrival = arrival
+        self.departure = datetime.datetime.strptime(departure, "%Y-%m-%d %H:%M").strftime("%Y-%m-%dT%H:%M:%S")
+        self.arrival = datetime.datetime.strptime(arrival, "%Y-%m-%d %H:%M").strftime("%Y-%m-%dT%H:%M:%S")
+        self.duration = duration
         self.amount = amount
+        self.modal = modal
 
     def to_json(self):
         return {
@@ -978,7 +1006,9 @@ class Flight(object):
             "company": self.company,
             "departure": self.departure,
             "arrival": self.arrival,
-            "amount": self.amount
+            "amount": self.amount,
+            "duration": self.duration,
+            "modal": self.modal
         }
 
 
