@@ -34,7 +34,7 @@ class ConfirmProductsView(View):
             starting = route.get("starting", "")
             destination = route.get("destination", "")
             content = "航空公司: %s, 航班号: %s, 出发时间: %s, 抵达时间: %s, 出发地: %s, 抵达地: %s"\
-                      % (number, company, departure, arrival, starting, destination)
+                      % (company, number, departure, arrival, starting, destination)
             contents.append(content)
         return "</br>".join(contents)
 
