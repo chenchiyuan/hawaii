@@ -1,12 +1,26 @@
 <!doctype html>
-<html ng-app lang="zh-cn">
+<html ng-app="hawaii" lang="zh-cn">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta charset="UTF-8">
     <link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="http://cdn.staticfile.org/angular.js/1.2.5/angular.min.js"></script>
+    <script>
+        angular.module('hawaii',['ngRoute']).
+         config(['$routeProvider', function($routeProvider) {
+            $routeProvider.
+            when('/products', {templateUrl: 'products', controller: SearchController}).
+            when('/validate', {templateUrl: 'validate', controller: ValidateController}).
+            otherwise({redirectTo: '/'});
+    }]);
+    </script>
+    <script>
+        function ValidateController($score){
+
+        }
+    </script>
     <script >
-        function SearchController($scope) {
+        function SearchController($scope, $location) {
             $scope.hotels = [
                 {name:'希尔顿酒店', selected:true},
                 {name:'七天连锁', selected:false}
@@ -31,6 +45,10 @@
                 }else{
                     return "http://google.com";
                 }
+            };
+
+            $scope.changeUrl = function(){
+                $location.path('/');
             };
         }
 
@@ -88,6 +106,8 @@
     </script>
 </head>
 <body>
+    <script type="text/ng-template" id="products">
+
 <div class="data-wrapper" ng-controller="SearchController" id="search-controller">
     <div class="products-wrapper container">
         <h3>酒店</h3>
@@ -115,7 +135,13 @@
             </tr>
         </table>
     </div>
-    <div><a class="fixed-footer" id="submit-products" href="{{getUrl()}}"><span>提交</span></a></div>
+      <form ng-submit="changeRoute()">
+        <input class="btn-primary" type="submit" value="add">
+      </form>
 </div>
+</script>
+    <script type="text/ng-template" id="validate">
+<h1>user form</h1>
+    </script>
 </body>
 </html>

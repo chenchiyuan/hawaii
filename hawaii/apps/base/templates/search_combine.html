@@ -1,14 +1,29 @@
 <!doctype html>
 {% verbatim %}
-<html ng-app lang="zh-cn">
+<html ng-app="hawaii" lang="zh-cn">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta charset="UTF-8">
     <link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="http://cdn.staticfile.org/angular.js/1.2.5/angular.min.js"></script>
+    <script>
+        angular.module('hawaii',['ngRoute']).
+        config(['$routeProvider', function($routeProvider) {
+        $routeProvider.
+            when('/', {templateUrl: 'products.html', controller: SearchController}).
+            when('/validate', {templateUrl: 'validate.html', controller: ValidateController}).
+            otherwise({redirectTo: '/'});
+    }]);
+    </script>
+    <script>
+        function ValidateController($scope){
+
+        }
+    </script>
     <script >
         function SearchController($scope, $http) {
             $scope.loadded = false;
+            $scope.user_checked = false;
             var querystring = location.href.substring(location.href.indexOf("?")+1);
             var request = $http({
                 method: 'GET',
@@ -32,11 +47,7 @@
                         hotels.push(hotel);
                     }
                 });
-                if(typeof hotels !== 'undefined' && hotels.length > 0){
-                    return "http://baidu.com";
-                }else{
-                    return "http://google.com";
-                }
+                return "#validate";
             };
         }
 
@@ -170,7 +181,9 @@
     </script>
 </head>
 <body>
-<div class="data-wrapper" ng-controller="SearchController" id="search-controller">
+<div ng-view></div>
+<script type="text/ng-template" id="products.html">
+    <div class="data-wrapper" ng-controller="SearchController" id="search-controller">
     <div class="m-spin" ng-if = "!loadded">
       <div class="u-spin">
           <div class="bar1"></div>
@@ -183,7 +196,7 @@
           <div class="bar8"></div>
       </div>
     </div>
-    <div class="products-wrapper container" ng-show="loadded">
+    <div class="products-wrapper container" ng-show="loadded & !user_checked">
         <h3>航班</h3>
         <table class="table table-hover routes" ng-repeat="route in routes">
             <tr class="row" ng-class="{true:'success', false:''}[route.selected]">
@@ -225,7 +238,7 @@
         </table>
 
     </div>
-    <div class="products-wrapper container" ng-show="loadded">
+    <div class="products-wrapper container" ng-show="loadded & !user_checked">
         <h3>酒店</h3>
         <table class="table table-hover">
             <tr class="row">
@@ -242,7 +255,7 @@
             </tr>
         </table>
     </div>
-    <div class="products-wrapper container" ng-show="loadded">
+    <div class="products-wrapper container" ng-show="loadded & !user_checked">
         <h3>目的地产品</h3>
         <table class="table table-hover">
             <tr class="row">
@@ -261,6 +274,11 @@
     </div>
     <div><a class="fixed-footer" id="submit-products" href="{{getUrl()}}"><span>提交</span></a></div>
 </div>
+</script>
+
+<script type="text/ng-template" id="validate.html">
+<h1>user view</h1>
+</script>
 </body>
 </html>
 {% endverbatim %}

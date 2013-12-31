@@ -11,6 +11,10 @@ from hawaii.apps.commodity.models import CommodityProduct
 from hawaii.apps.plane.services import Route, City
 
 
+class ConfirmProductsView(TemplateView):
+    template_name = ""
+
+
 class SearchProductsView(TemplateView):
     template_name = "search_combine.html"
 
