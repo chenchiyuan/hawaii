@@ -1,23 +1,65 @@
 <!doctype html>
 {% verbatim %}
-<html ng-app="hawaii" lang="zh-cn">
+<html lang="zh-cn">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta charset="UTF-8">
     <link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <script src="http://cdn.staticfile.org/angular.js/1.2.5/angular.min.js"></script>
+    <script type="text/javascript" src="/static/js/angular-1.2.3/angular.min.js"></script>
+    <script type="text/javascript" src="/static/js/angular-1.2.3/angular-route.min.js"></script>
     <script>
-        angular.module('hawaii',['ngRoute']).
-        config(['$routeProvider', function($routeProvider) {
-        $routeProvider.
-            when('/', {templateUrl: 'products.html', controller: SearchController}).
-            when('/validate', {templateUrl: 'validate.html', controller: ValidateController}).
-            otherwise({redirectTo: '/'});
-    }]);
+        angular.module('hawaii',['ngRoute',])
+                .config(['$routeProvider', function($routeProvider) {
+                    $routeProvider.
+                            when('/', {templateUrl: 'products.html', controller: SearchController}).
+                            when('/validate', {templateUrl: 'validate.html', controller: ValidateController}).
+                            when('/success', {templateUrl: 'success.html', controller: SuccessController}).
+                            otherwise({redirectTo: '/'});
+                }]);
     </script>
     <script>
-        function ValidateController($scope){
+        function SuccessController($scope){
 
+        }
+
+        function ValidateController($scope, $http, $location){
+            $scope.user_count = 1;
+            $scope.users = [{
+                "firstname": "姓",
+                "secondname": "名",
+                "gender": "m",
+                "country": "中国",
+                "birthday": "1980-01-01"
+            }];
+            $scope.phone = "";
+
+            $scope.countChange = function(){
+                if($scope.user_count <= 1){
+                    $scope.users = $scope.users.slice(0, 1);
+                }
+                else if($scope.users.length >= $scope.user_count){
+                    $scope.users = $scope.users.slice(0, $scope.user_count);
+                }else{
+                    var push_count = $scope.user_count - $scope.users.length;
+                    for(var i=0; i<push_count; i++){
+                        $scope.users.push({});
+                    }
+                }
+            };
+
+            $scope.submit = function(){
+
+
+                var data = {
+                    "phone": $scope.phone,
+                    "users": $scope.users,
+                    "products": window.products
+                };
+                console.log(data);
+                $http.post("/confirm/", data).success(function(data, status, headers, config){
+                     $location.path("/success");
+                });
+            };
         }
     </script>
     <script >
@@ -39,14 +81,31 @@
 
 
             $scope.getUrl = function(){
-                var base_url = "http://baidu.com";
                 var hotels = [];
+                var routes = [];
                 var commodities = [];
                 angular.forEach($scope.hotels, function(hotel){
                     if(hotel.selected){
                         hotels.push(hotel);
                     }
                 });
+                angular.forEach($scope.routes, function(route){
+                    if(route.selected){
+                        routes.push(route);
+                    }
+                });
+                angular.forEach($scope.commodities, function(commodity){
+                    if(commodity.selected){
+                        commodities.push(commodity);
+                    }
+                });
+
+                products = {
+                    "hotels": hotels,
+                    "routes": routes,
+                    "commodities": commodities
+                };
+                window.products = products;
                 return "#validate";
             };
         }
@@ -171,16 +230,13 @@
                 -webkit-transform: scale(0.5) rotate(360deg);
             }
         }
-    </style>
-    <script>
-        function submit(){
-            hotel_scope = angular.element(document.getElementById('hotel-controller')).scope();
-            console.log(hotel_scope.hotels);
-            alert(hotel_scope.hotels);
+
+        .form_root {
+            border: 1px;
         }
-    </script>
+    </style>
 </head>
-<body>
+<body ng-app="hawaii">
 <div ng-view></div>
 <script type="text/ng-template" id="products.html">
     <div class="data-wrapper" ng-controller="SearchController" id="search-controller">
@@ -277,8 +333,86 @@
 </script>
 
 <script type="text/ng-template" id="validate.html">
-<h1>user view</h1>
+
+<form class="form-horizontal" role="form" ng-controller="ValidateController" id="validate-controller" ng-submit="submit()">
+    <div class="form-group">
+        <label for="user_count" class="col-xs-3 control-label"><span>出行人数</span>
+        </label>
+        <div class="col-xs-9">
+            <input type="number" class="form-control" id="user_count" ng-model="user_count" ng-change="countChange()" name="user_count" placeholder="{{ user_count }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="phone" class="col-xs-3 control-label"><span>手机号</span>
+        </label>
+        <div class="col-xs-9">
+            <input type="phone" class="form-control" id="phone" ng-model="phone" name="phone" placeholder="{{ phone }}">
+        </div>
+    </div>
+    <hr/>
+    <div class="form_root" ng-model="users[$index]" ng-repeat="user in users track by $index">
+        <div class="form-group">
+            <label for="firstname" class="col-xs-3 control-label"><span>姓</span>
+            </label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control" id="firstname" name="firstname" ng-model="users[$index].firstname" placeholder="姓">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="secondname" class="col-xs-3 control-label"><span>名</span>
+            </label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control" id="secondname" name="secondname" ng-model="users[$index].secondname" placeholder="名">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="gender" class="col-xs-3 control-label"><span>性别</span>
+            </label>
+            <div class="col-xs-9">
+                <select class="form-control" name="gender" id="gender" ng-model="user.gender">
+                    <option value="m">男</option>
+                    <option value="f">女</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="country" class="col-xs-3 control-label"><span>国籍</span>
+            </label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control" id="country" name="country" ng-model="users[$index].country" placeholder="中国">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="identify" class="col-xs-3 control-label"><span>证件号</span>
+            </label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control" id="identify" name="identify" ng-model="users[$index].identify" placeholder="">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="birthday" class="col-xs-3 control-label"><span>出生日期</span>
+            </label>
+            <div class="col-xs-9">
+                <input type="date" class="form-control" id="birthday" name="birthday" ng-model="users[$index].birthday" placeholder="">
+            </div>
+        </div>
+        <hr/>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-12" style="text-align: center;">
+            <button type="submit" class="btn btn-default">提交</button>
+        </div>
+    </div>
+</form>
 </script>
+
+<script type="text/ng-template" id="success.html">
+    <div class="alert alert-success">
+        您的订单已经提交给客服！稍后会有客服联系您，谢谢！
+    </div>
+</script>
+
 </body>
 </html>
 {% endverbatim %}

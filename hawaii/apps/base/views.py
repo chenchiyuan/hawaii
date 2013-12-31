@@ -11,8 +11,15 @@ from hawaii.apps.commodity.models import CommodityProduct
 from hawaii.apps.plane.services import Route, City
 
 
-class ConfirmProductsView(TemplateView):
-    template_name = ""
+class ConfirmProductsView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ConfirmProductsView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, requests, *args, **kwargs):
+        import json
+        print(json.loads(requests.body))
+        return json_response({"status": 200})
 
 
 class SearchProductsView(TemplateView):
