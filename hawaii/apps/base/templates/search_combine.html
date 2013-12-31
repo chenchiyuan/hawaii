@@ -24,13 +24,15 @@
 
         function ValidateController($scope, $http, $location){
             $scope.user_count = 1;
-            $scope.users = [{
+            var default_user = {
                 "firstname": "姓",
                 "secondname": "名",
                 "gender": "m",
                 "country": "中国",
                 "birthday": "1980-01-01"
-            }];
+            };
+            $scope.users = [];
+            $scope.users.push(angular.copy(default_user));
             $scope.phone = "";
 
             $scope.countChange = function(){
@@ -42,7 +44,7 @@
                 }else{
                     var push_count = $scope.user_count - $scope.users.length;
                     for(var i=0; i<push_count; i++){
-                        $scope.users.push({});
+                        $scope.users.push(angular.copy(default_user));
                     }
                 }
             };
