@@ -5,10 +5,12 @@ from __future__ import division, unicode_literals, print_function
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView, View
+from libs.emails import send_email
 from libs.http import json_response
 from hawaii.apps.hotel.models import HotelProduct
 from hawaii.apps.commodity.models import CommodityProduct
 from hawaii.apps.plane.services import Route, City
+import json
 
 
 class ConfirmProductsView(View):
@@ -17,10 +19,49 @@ class ConfirmProductsView(View):
         return super(ConfirmProductsView, self).dispatch(request, *args, **kwargs)
 
     def post(self, requests, *args, **kwargs):
-        import json
-        print(json.loads(requests.body))
+        products_json_data = json.loads(requests.body)
+        html = self.get_html(**products_json_data)
+        send_email("chenchiyuan03@gmail.com;kent03@163.com", subject=u"新订单", html=html)
         return json_response({"status": 200})
 
+    def routes(self, routes):
+        contents = []
+        for route in routes:
+            number = route.get("number", "")
+            company = route.get("company", "")
+            departure = route.get("departure", "")
+            arrival = route.get("arrival", "")
+            starting = route.get("starting", "")
+            destination = route.get("destination", "")
+            content = "航空公司: %s, 航班号: %s, 出发时间: %s, 抵达时间: %s, 出发地: %s, 抵达地: %s"\
+                      % (number, company, departure, arrival, starting, destination)
+            contents.append(content)
+        return "</br>".join(contents)
+
+    def hotels(self, hotels):
+        pass
+
+    def commodities(self, commodities):
+        pass
+
+    def users(self, users):
+        contents = []
+        for user in users:
+            username = user.get("firstname", "") + user.get("secondname", "")
+            birthday = user.get("birthday", "")
+            identify = user.get("identify", "")
+            country = user.get("country", "")
+            content = "用户名: %s, 生日: %s, 身份证: %s, 国籍: %s" % (username, birthday, identify, country)
+            contents.append(content)
+        return "</br>".join(contents)
+
+    def get_html(self, phone="", users=[], products=[], **kwargs):
+        html = []
+        phone_html = "手机号: %s" % phone
+        users_html = self.users(users)
+        routes_html = self.routes(products.get("routes", []))
+        html.extend([phone_html, users_html, routes_html])
+        return "</br>".join(html)
 
 class SearchProductsView(TemplateView):
     template_name = "search_combine.html"

@@ -5,7 +5,7 @@ from __future__ import division, unicode_literals, print_function
 import requests
 
 
-def send_email(from_email, to_email, subject="", html=""):
+def send_email(to_email, subject="", html="", from_email="zoneke.ccy@gmail.com"):
     url = "https://sendcloud.sohu.com/webapi/mail.send.xml"
     params = {
         "api_user": "postmaster@zoneke.sendcloud.org",
