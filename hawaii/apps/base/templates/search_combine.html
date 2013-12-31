@@ -2,241 +2,263 @@
 {% verbatim %}
 <html lang="zh-cn">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <script type="text/javascript" src="/static/js/angular-1.2.3/angular.min.js"></script>
-    <script type="text/javascript" src="/static/js/angular-1.2.3/angular-route.min.js"></script>
-    <script>
-        angular.module('hawaii',['ngRoute',])
-                .config(['$routeProvider', function($routeProvider) {
-                    $routeProvider.
-                            when('/', {templateUrl: 'products.html', controller: SearchController}).
-                            when('/validate', {templateUrl: 'validate.html', controller: ValidateController}).
-                            when('/success', {templateUrl: 'success.html', controller: SuccessController}).
-                            otherwise({redirectTo: '/'});
-                }]);
-    </script>
-    <script>
-        function SuccessController($scope){
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8">
+<link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="/static/js/angular-1.2.3/angular.min.js"></script>
+<script type="text/javascript" src="/static/js/angular-1.2.3/angular-route.min.js"></script>
+<script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.9.0.js"></script>
 
-        }
+<script>
+    angular.module('hawaii',['ngRoute', 'ui.bootstrap'])
+            .config(['$routeProvider', function($routeProvider) {
+                $routeProvider.
+                        when('/', {templateUrl: 'products.html', controller: SearchController}).
+                        when('/validate', {templateUrl: 'validate.html', controller: ValidateController}).
+                        when('/success', {templateUrl: 'success.html', controller: SuccessController}).
+                        otherwise({redirectTo: '/'});
+            }]);
+</script>
+<script>
+    function SuccessController($scope){
 
-        function ValidateController($scope, $http, $location){
-            $scope.user_count = 1;
-            var default_user = {
-                "firstname": "姓",
-                "secondname": "名",
-                "gender": "m",
-                "country": "中国",
-                "birthday": "1980-01-01"
-            };
-            $scope.users = [];
-            $scope.users.push(angular.copy(default_user));
-            $scope.phone = "";
+    }
 
-            $scope.countChange = function(){
-                if($scope.user_count <= 1){
-                    $scope.users = $scope.users.slice(0, 1);
+    function ValidateController($scope, $http, $location){
+        $scope.user_count = 1;
+        var default_user = {
+            "firstname": "姓",
+            "secondname": "名",
+            "gender": "m",
+            "country": "中国",
+            "birthday": "1980-01-01"
+        };
+        $scope.users = [];
+        $scope.users.push(angular.copy(default_user));
+        $scope.phone = "";
+
+        $scope.countChange = function(){
+            if($scope.user_count <= 1){
+                $scope.users = $scope.users.slice(0, 1);
+            }
+            else if($scope.users.length >= $scope.user_count){
+                $scope.users = $scope.users.slice(0, $scope.user_count);
+            }else{
+                var push_count = $scope.user_count - $scope.users.length;
+                for(var i=0; i<push_count; i++){
+                    $scope.users.push(angular.copy(default_user));
                 }
-                else if($scope.users.length >= $scope.user_count){
-                    $scope.users = $scope.users.slice(0, $scope.user_count);
-                }else{
-                    var push_count = $scope.user_count - $scope.users.length;
-                    for(var i=0; i<push_count; i++){
-                        $scope.users.push(angular.copy(default_user));
+            }
+        };
+
+        $scope.submit = function(){
+            var data = {
+                "phone": $scope.phone,
+                "users": $scope.users,
+                "products": window.products
+            };
+            $http.post("/confirm/", data).success(function(data, status, headers, config){
+                $location.path("/success");
+            });
+        };
+    }
+</script>
+<script >
+    function SearchController($scope, $http, $modal) {
+        $scope.loadded = false;
+        $scope.user_checked = false;
+        var querystring = location.href.substring(location.href.indexOf("?")+1);
+        var request = $http({
+            method: 'GET',
+            url: '/search/' + "?" + querystring
+        });
+
+        request.success(function(response, status, headers, config){
+            $scope.routes = response.routes;
+            $scope.hotels = response.hotels;
+            $scope.commodities = response.commodities;
+            $scope.loadded = true;
+        });
+
+        $scope.openRoute = function(route) {
+            var modalInstance = $modal.open({
+                templateUrl: 'modal.html',
+                controller: ModalInstanceCtrl,
+                resolve: {
+                    route: function () {
+                        return route;
                     }
                 }
-            };
+            });
+        };
 
-            $scope.submit = function(){
-
-
-                var data = {
-                    "phone": $scope.phone,
-                    "users": $scope.users,
-                    "products": window.products
-                };
-                console.log(data);
-                $http.post("/confirm/", data).success(function(data, status, headers, config){
-                     $location.path("/success");
-                });
-            };
-        }
-    </script>
-    <script >
-        function SearchController($scope, $http) {
-            $scope.loadded = false;
-            $scope.user_checked = false;
-            var querystring = location.href.substring(location.href.indexOf("?")+1);
-            var request = $http({
-                method: 'GET',
-                url: '/search/' + "?" + querystring
+        $scope.getUrl = function(){
+            var hotels = [];
+            var routes = [];
+            var commodities = [];
+            angular.forEach($scope.hotels, function(hotel){
+                if(hotel.selected){
+                    hotels.push(hotel);
+                }
+            });
+            angular.forEach($scope.routes, function(route){
+                if(route.selected){
+                    routes.push(route);
+                }
+            });
+            angular.forEach($scope.commodities, function(commodity){
+                if(commodity.selected){
+                    commodities.push(commodity);
+                }
             });
 
-            request.success(function(response, status, headers, config){
-                $scope.routes = response.routes;
-                $scope.hotels = response.hotels;
-                $scope.commodities = response.commodities;
-                $scope.loadded = true;
-            });
-
-
-            $scope.getUrl = function(){
-                var hotels = [];
-                var routes = [];
-                var commodities = [];
-                angular.forEach($scope.hotels, function(hotel){
-                    if(hotel.selected){
-                        hotels.push(hotel);
-                    }
-                });
-                angular.forEach($scope.routes, function(route){
-                    if(route.selected){
-                        routes.push(route);
-                    }
-                });
-                angular.forEach($scope.commodities, function(commodity){
-                    if(commodity.selected){
-                        commodities.push(commodity);
-                    }
-                });
-
-                products = {
-                    "hotels": hotels,
-                    "routes": routes,
-                    "commodities": commodities
-                };
-                window.products = products;
-                return "#validate";
+            var products = {
+                "hotels": hotels,
+                "routes": routes,
+                "commodities": commodities
             };
-        }
+            window.products = products;
+            return "#validate";
+        };
+    }
 
-    </script>
-    <style type="text/css">
-        body {
-            margin-bottom: 60px;
-        }
-        .fixed-footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #3fbc48;
-            font-size: 1.2em;
-            text-align: center;
-            padding: 15px 0;
-            height: 60px;
-        }
-        .fixed-footer a {
-            text-decoration: none;
-            color: #fff;
+    function ModalInstanceCtrl($scope, $modalInstance, route) {
 
-        }
-        a:link{
-            text-decoration: none;
-            color: #fff;
+        $scope.route = route;
 
-        }
+        $scope.ok = function () {
+            $modalInstance.dismiss('cancel');
+        };
 
-        a:hover{
-            text-decoration: none;
-            color: #fff;
-        }
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    };
+</script>
+<style type="text/css">
+    body {
+        margin-bottom: 60px;
+    }
+    .fixed-footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #3fbc48;
+        font-size: 1.2em;
+        text-align: center;
+        padding: 15px 0;
+        height: 60px;
+    }
+    .fixed-footer a {
+        text-decoration: none;
+        color: #fff;
 
-        a:visited {
-            text-decoration: none;
-        }
+    }
+    a:link{
+        text-decoration: none;
+        color: #fff;
 
-        .fixed-footer span {
-            display: block;
-            color: #fff;
-            font-size: 1.2em;
-        }
+    }
 
-        .routes thead>tr>th, .routes tbody>tr>th, .routes tfoot>tr>th, .routes thead>tr>td, .routes tbody>tr>td, .routes tfoot>tr>td {
-            vertical-align: middle;
-        }
-    </style>
-    <style type="text/css">
-        .m-spin {
-            z-index: 2;
-            width: 150px;
-            height: 150px;
-            border-radius: 10px;
-            background-color: rgba(0, 0, 0, 0.6);
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            margin-left: -75px;
-            margin-top: -75px;
-        }
-        .m-spin .u-spin {
-            width: 100px;
-            height: 100px;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            margin-left: -50px;
-            margin-top: -50px;
-            -webkit-animation-name: rotateThis;
-            -webkit-animation-duration: 2s;
-            -webkit-animation-iteration-count: infinite;
-            -webkit-animation-timing-function: linear;
-        }
-        .m-spin .u-spin div {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #FFF;
-            -webkit-border-radius: 40px;
-            left: 40px;
-            top: 40px;
-        }
-        .m-spin .u-spin .bar1 {
-            -webkit-transform: rotate(0deg) translate(0, -40px);
-            opacity: .12;
-        }
-        .m-spin .u-spin .bar2 {
-            -webkit-transform: rotate(45deg) translate(0, -40px);
-            opacity: .25;
-        }
-        .m-spin .u-spin .bar3 {
-            -webkit-transform: rotate(90deg) translate(0, -40px);
-            opacity: .37;
-        }
-        .m-spin .u-spin .bar4 {
-            -webkit-transform: rotate(135deg) translate(0, -40px);
-            opacity: .5;
-        }
-        .m-spin .u-spin .bar5 {
-            -webkit-transform: rotate(180deg) translate(0, -40px);
-            opacity: .62;
-        }
-        .m-spin .u-spin .bar6 {
-            -webkit-transform: rotate(225deg) translate(0, -40px);
-            opacity: .75;
-        }
-        .m-spin .u-spin .bar7 {
-            -webkit-transform: rotate(270deg) translate(0, -40px);
-            opacity: .87;
-        }
-        .m-spin .u-spin .bar8 {
-            -webkit-transform: rotate(315deg) translate(0, -40px);
-            opacity: 1;
-        }
-        @-webkit-keyframes rotateThis {
-            from {
-                -webkit-transform: scale(0.5) rotate(0deg);
-            }
-            to {
-                -webkit-transform: scale(0.5) rotate(360deg);
-            }
-        }
+    a:hover{
+        text-decoration: none;
+        color: #fff;
+    }
 
-        .form_root {
-            border: 1px;
+    a:visited {
+        text-decoration: none;
+    }
+
+    .fixed-footer span {
+        display: block;
+        color: #fff;
+        font-size: 1.2em;
+    }
+
+    .routes thead>tr>th, .routes tbody>tr>th, .routes tfoot>tr>th, .routes thead>tr>td, .routes tbody>tr>td, .routes tfoot>tr>td {
+        vertical-align: middle;
+    }
+</style>
+<style type="text/css">
+    .m-spin {
+        z-index: 2;
+        width: 150px;
+        height: 150px;
+        border-radius: 10px;
+        background-color: rgba(0, 0, 0, 0.6);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: -75px;
+        margin-top: -75px;
+    }
+    .m-spin .u-spin {
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: -50px;
+        margin-top: -50px;
+        -webkit-animation-name: rotateThis;
+        -webkit-animation-duration: 2s;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-timing-function: linear;
+    }
+    .m-spin .u-spin div {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: #FFF;
+        -webkit-border-radius: 40px;
+        left: 40px;
+        top: 40px;
+    }
+    .m-spin .u-spin .bar1 {
+        -webkit-transform: rotate(0deg) translate(0, -40px);
+        opacity: .12;
+    }
+    .m-spin .u-spin .bar2 {
+        -webkit-transform: rotate(45deg) translate(0, -40px);
+        opacity: .25;
+    }
+    .m-spin .u-spin .bar3 {
+        -webkit-transform: rotate(90deg) translate(0, -40px);
+        opacity: .37;
+    }
+    .m-spin .u-spin .bar4 {
+        -webkit-transform: rotate(135deg) translate(0, -40px);
+        opacity: .5;
+    }
+    .m-spin .u-spin .bar5 {
+        -webkit-transform: rotate(180deg) translate(0, -40px);
+        opacity: .62;
+    }
+    .m-spin .u-spin .bar6 {
+        -webkit-transform: rotate(225deg) translate(0, -40px);
+        opacity: .75;
+    }
+    .m-spin .u-spin .bar7 {
+        -webkit-transform: rotate(270deg) translate(0, -40px);
+        opacity: .87;
+    }
+    .m-spin .u-spin .bar8 {
+        -webkit-transform: rotate(315deg) translate(0, -40px);
+        opacity: 1;
+    }
+    @-webkit-keyframes rotateThis {
+        from {
+            -webkit-transform: scale(0.5) rotate(0deg);
         }
-    </style>
+        to {
+            -webkit-transform: scale(0.5) rotate(360deg);
+        }
+    }
+
+    .form_root {
+        border: 1px;
+    }
+</style>
 </head>
 <body ng-app="hawaii">
 <div ng-view></div>
@@ -257,7 +279,7 @@
     <div class="products-wrapper container" ng-show="loadded & !user_checked">
         <h3>航班</h3>
         <table class="table table-hover routes" ng-repeat="route in routes">
-            <tr class="row" ng-class="{true:'success', false:''}[route.selected]">
+            <tr class="row" ng-class="{true:'success', false:''}[route.selected]" ng-click="openRoute(route)">
                 <td class="col-xs-2">
                     {{ route.starting }}
                 </td>
@@ -268,30 +290,6 @@
                     ￥{{ route.price }}+{{ route.tax }}
                 </td>
                 <td class="col-xs-1"><input type="checkbox" ng-model="route.selected"/></td>
-            </tr>
-            <tr class="row">
-                <td ng-show="route.selected" colspan="4">
-                    <div class="container">
-                        <table class="table" ng-repeat="flight in route.flights">
-                            <tr class="row">
-                                <td class="col-xs-6">航空公司: {{ flight.company }}</td>
-                                <td class="col-xs-6">航班号: {{ flight.number }}</td>
-                            </tr>
-                            <tr class="row">
-                                <td class="col-xs-6">机型: {{ flight.modal }}</td>
-                                <td class="col-xs-6">飞行时间: {{ flight.duration }}</td>
-                            </tr>
-                            <tr class="row">
-                                <td class="col-xs-6">起飞机场: {{ flight.starting }}</td>
-                                <td class="col-xs-6">抵达机场: {{ flight.destination }}</td>
-                            </tr>
-                            <tr class="row">
-                                <td class="col-xs-6">起飞时间: {{ flight.departure|date:'yyyy-MM-dd HH:mm' }}</td>
-                                <td class="col-xs-6">抵达时间: {{ flight.arrival|date:'yyyy-MM-dd HH:mm' }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </td>
             </tr>
         </table>
 
@@ -330,7 +328,9 @@
             </tr>
         </table>
     </div>
-    <div><a class="fixed-footer" id="submit-products" href="{{getUrl()}}"><span>提交</span></a></div>
+    <div><a class="fixed-footer" id="submit-products" href="{{test()}}"><span>提交</span></a></div>
+
+
 </div>
 </script>
 
@@ -413,6 +413,43 @@
     <div class="alert alert-success">
         您的订单已经提交给客服！稍后会有客服联系您，谢谢！
     </div>
+</script>
+
+<script type="text/ng-template" id="modal.html">
+        <div class="modal-header" ng-model="route">
+            <h3>{{ route.number }}</h3>
+        </div>
+        <div class="modal-body">
+        <table ng-model="route">
+            <tr class="row">
+                <td>
+                    <div class="container">
+                        <table class="table" ng-repeat="flight in route.flights">
+                            <tr class="row">
+                                <td class="col-xs-6">航空公司: {{ flight.company }}</td>
+                                <td class="col-xs-6">航班号: {{ flight.number }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">机型: {{ flight.modal }}</td>
+                                <td class="col-xs-6">飞行时间: {{ flight.duration }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">起飞机场: {{ flight.starting }}</td>
+                                <td class="col-xs-6">抵达机场: {{ flight.destination }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">起飞时间: {{ flight.departure|date:'yyyy-MM-dd HH:mm' }}</td>
+                                <td class="col-xs-6">抵达时间: {{ flight.arrival|date:'yyyy-MM-dd HH:mm' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+        </div>
 </script>
 
 </body>
