@@ -3,7 +3,7 @@
     <script type="text/javascript" src="/static/js/angular-1.2.3/angular.min.js"></script>
     <script>
         function FormController($scope){
-            $scope.status = 0;
+            $scope.status = 1;
         }
     </script>
 {% endblock %}
@@ -18,20 +18,23 @@
 
 {% block body %}
 {% verbatim %}
-
+    <img src="http://www.hawaiianairlines.com.cn/App_Themes/hawaiianair.cn_dev/img/aboutus/AboutUs-Header.jpg" alt="" class="img-responsive" style="margin-bottom: 10px;"/>
     <form class="form-horizontal" role="form" action="/products/" method="get" ng-app
             ng-controller="FormController" id="form-controller">
-        <div class="form-group">
-            <label for="status" class="col-xs-4 control-label"><span><i class="icon-suitcase"> 单程</i></span>
-            </label>
+        <div class="form-group row">
             <div class="col-xs-2">
+
+            </div>
+             <div class="col-xs-2">
                 <input type="radio" ng-model="status" value="0"/>
             </div>
-            <label for="status" class="col-xs-4 control-label"><span><i class="icon-suitcase"> 往返</i></span>
+            <label for="status" class="col-xs-2 control-label">单程</span>
             </label>
             <div class="col-xs-2">
                 <input type="radio" ng-model="status" value="1"/>
             </div>
+            <label for="status" class="col-xs-2 control-label"><span>往返</span>
+            </label>
         </div>
         <div class="form-group">
             <label for="starting" class="col-xs-4 control-label"><span><i class="icon-plane"> 出发城市</i></span></label>

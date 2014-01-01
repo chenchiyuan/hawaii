@@ -289,10 +289,10 @@
     <div class="products-wrapper container" ng-show="routes">
         <h4>选择航班</h4>
         <table class="table table-hover routes">
-            <tr class="row">
-                <td class="col-xs-4">航空公司</td>
-                <td class=col-xs-2">转机</td>
-                <td class="col-xs-5">价格</td>
+            <tr class="row success">
+                <td class="col-xs-4"><strong>航空公司</strong></td>
+                <td class=col-xs-2"><strong>转机</strong></td>
+                <td class="col-xs-5"><strong>价格</strong></td>
                 <td class="col-xs-1"></td>
             </tr>
 
@@ -314,10 +314,10 @@
     <div class="products-wrapper container" ng-show="routes && commodities">
         <h4>优惠促销</h4>
         <table class="table table-hover">
-            <tr class="row">
-                <td class="col-xs-5">产品名</td>
-                <td class="col-xs-3">类型</td>
-                <td class="col-xs-3">价格</td>
+            <tr class="row success">
+                <td class="col-xs-5"><strong>产品名</strong></td>
+                <td class="col-xs-3"><strong>类型</strong></td>
+                <td class="col-xs-3"><strong>价格</strong></td>
                 <td class="col-xs-1"></td>
             </tr>
             <tr class="row" ng-class="{true:'success', false:''}[commodity.selected]" ng-repeat="commodity in commodities">
@@ -331,10 +331,10 @@
     <div class="products-wrapper container" ng-show="routes && hotels">
         <h4>特价酒店</h4>
         <table class="table table-hover">
-            <tr class="row">
-                <td class="col-xs-5">酒店名</td>
-                <td class="col-xs-3">类型</td>
-                <td class="col-xs-3">价格</td>
+            <tr class="row success">
+                <td class="col-xs-5"><strong>酒店名</strong></td>
+                <td class="col-xs-3"><strong>类型</strong></td>
+                <td class="col-xs-3"><strong>价格</strong></td>
                 <td class="col-xs-1"></td>
             </tr>
             <tr class="row" ng-class="{true:'success', false:''}[hotel.selected]" ng-repeat="hotel in hotels">
@@ -454,7 +454,7 @@
 
 <script type="text/ng-template" id="modal.html">
         <div class="modal-body">
-        <h3>去程: {{ route.starting }} - {{ route.destination }}</h3>
+        <h4>{{ route.starting }} - {{ route.destination }}</h4>
         <table ng-model="route">
             <tr class="row">
                 <td>
@@ -482,7 +482,7 @@
             </tr>
         </table>
 
-        <h3>回程: {{ route.destination }} - {{ route.starting }}</h3>
+        <h4>{{ route.destination }} - {{ route.starting }}</h4>
         <table ng-model="route">
             <tr class="row">
                 <td>
