@@ -10,6 +10,7 @@ from libs.http import json_response
 from hawaii.apps.hotel.models import HotelProduct
 from hawaii.apps.commodity.models import CommodityProduct
 from hawaii.apps.plane.services import Route, City
+from libs.datetimes import str_to_datetime, datetime_delta, DATE_FORMAT
 import json
 
 
@@ -81,14 +82,21 @@ class SearchQueryView(View):
         query_dict = self.get_route_query_dict(request, *args, **kwargs)
         city = City.get_name(query_dict.get("destination", ""))
         routes_search = Route.search(**query_dict)
+        departure = str_to_datetime(query_dict.get("departure", ""), DATE_FORMAT)
+        departure_tomorrow = datetime_delta(departure, days=1)
+
         if not city:
             hotels = []
             commodities = []
         else:
             hotels = map(lambda hotel: hotel.to_json(),
-                         list(HotelProduct.objects.filter(city=city)))
+                         list(HotelProduct.objects.filter(city=city,
+                                                          check_in_time__gte=departure,
+                                                          check_in_time__lt=departure_tomorrow)))
             commodities = map(lambda commodity: commodity.to_json(),
-                              list(CommodityProduct.objects.filter(city=city)))
+                              list(CommodityProduct.objects.filter(city=city,
+                                                                   datetime__gte=departure,
+                                                                   datetime__lt=departure_tomorrow)))
         routes = map(lambda route: route.to_json(), routes_search)
 
         def cmp(a, b):
