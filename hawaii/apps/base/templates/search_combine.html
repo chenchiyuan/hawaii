@@ -7,10 +7,12 @@
 <link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
 <script type="text/javascript" src="/static/js/angular-1.2.3/angular.min.js"></script>
 <script type="text/javascript" src="/static/js/angular-1.2.3/angular-route.min.js"></script>
+<script type="text/javascript" src="/static/js/angular-1.2.3/angular-sanitize.min.js"></script>
+
 <script type="text/javascript" src="/static/js/ui-bootstrap-tpls-0.9.0.js"></script>
 
 <script>
-    angular.module('hawaii',['ngRoute', 'ui.bootstrap'])
+    angular.module('hawaii',['ngRoute', 'ui.bootstrap', 'ngSanitize'])
             .config(['$routeProvider', function($routeProvider) {
                 $routeProvider.
                         when('/', {templateUrl: 'products.html', controller: SearchController}).
@@ -100,12 +102,25 @@
             });
         };
 
+        $scope.openHtml = function(item) {
+            var modalInstance = $modal.open({
+                templateUrl: 'detail.html',
+                controller:  ModalDetailController,
+                resolve: {
+                    item: function(){
+                        return item;
+                    }
+                }
+            });
+        };
+
         $scope.submit = function(){
             var hotels = [];
             var routes = [];
             var commodities = [];
             angular.forEach($scope.hotels, function(hotel){
                 if(hotel.selected){
+                    hotel.html = "";
                     hotels.push(hotel);
                 }
             });
@@ -116,6 +131,7 @@
             });
             angular.forEach($scope.commodities, function(commodity){
                 if(commodity.selected){
+                    commodity.html = "";
                     commodities.push(commodity);
                 }
             });
@@ -142,6 +158,20 @@
             $modalInstance.dismiss('cancel');
         };
     };
+
+    function ModalDetailController($scope, $modalInstance, item, $sce) {
+        console.log(item);
+        $scope.item = item;
+
+        $scope.ok = function () {
+            $modalInstance.dismiss('cancel');
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    };
+
 </script>
 <style type="text/css">
     body {
@@ -270,7 +300,7 @@
 </head>
 <body ng-app="hawaii">
 <div ng-view></div>
-            <script type="text/ng-template" id="products.html">
+<script type="text/ng-template" id="products.html">
 
     <div class="data-wrapper" ng-controller="SearchController" id="search-controller">
     <div class="m-spin" ng-if = "!loadded">
@@ -320,11 +350,11 @@
                 <td class="col-xs-3"><strong>价格</strong></td>
                 <td class="col-xs-1"></td>
             </tr>
-            <tr class="row" ng-class="{true:'success', false:''}[commodity.selected]" ng-repeat="commodity in commodities">
+            <tr class="row" ng-class="{true:'success', false:''}[commodity.selected]" ng-click="openHtml(commodity)" ng-repeat="commodity in commodities">
                 <td class="col-xs-5">{{ commodity.name }}</td>
                 <td class="col-xs-3">{{ commodity.inventory_type }}</td>
                 <td class="col-xs-3">{{ commodity.price }}</td>
-                <td class="col-xs-1"><input type="checkbox" ng-model="commodity.selected"/></td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="commodity.selected" ng-click="$event.stopPropagation()" /></td>
             </tr>
         </table>
     </div>
@@ -337,11 +367,11 @@
                 <td class="col-xs-3"><strong>价格</strong></td>
                 <td class="col-xs-1"></td>
             </tr>
-            <tr class="row" ng-class="{true:'success', false:''}[hotel.selected]" ng-repeat="hotel in hotels">
+            <tr class="row" ng-class="{true:'success', false:''}[hotel.selected]" ng-click="openHtml(hotel)" ng-repeat="hotel in hotels">
                 <td class="col-xs-5">{{ hotel.name }}</td>
                 <td class="col-xs-3">{{ hotel.inventory_type }}</td>
                 <td class="col-xs-3">{{ hotel.price }}</td>
-                <td class="col-xs-1"><input type="checkbox" ng-model="hotel.selected"/></td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="hotel.selected" ng-click="$event.stopPropagation()" /></td>
             </tr>
         </table>
     </div>
@@ -509,6 +539,18 @@
                 </td>
             </tr>
         </table>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">关闭</button>
+        </div>
+</script>
+
+<script type="text/ng-template" id="detail.html">
+        <div class="modal-header" ng-modal="item">
+            <h4>{{ item.name }}</h4>
+        </div>
+        <div class="modal-body">
+            <div ng-bind-html="item.html">
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" ng-click="ok()">关闭</button>

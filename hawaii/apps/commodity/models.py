@@ -125,4 +125,5 @@ class CommodityProduct(models.Model):
             "price": self.price,
             "child_price": self.child_price,
             "remark": self.remark,
+            "html": self.inventory.commodity.information
         }

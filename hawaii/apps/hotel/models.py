@@ -25,7 +25,7 @@ class Hotel(models.Model):
             "id": self.id,
             "name": self.name,
             "city": self.city,
-            "information": self.information
+            "html": self.information
         }
 
 class HotelDay(models.Model):
@@ -134,5 +134,6 @@ class HotelProduct(models.Model):
             "inventory_type": self.inventory_type,
             "price": self.price,
             "breakfast": self.breakfast,
-            "remark": self.remark
+            "remark": self.remark,
+            "html": self.inventory.hotel.information
         }

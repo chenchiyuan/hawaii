@@ -6,6 +6,11 @@
             $scope.status = 1;
         }
     </script>
+    <script>
+    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+WeixinJSBridge.call('hideToolbar');
+});
+    </script>
 {% endblock %}
 
 {% block title %}
