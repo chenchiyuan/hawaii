@@ -289,7 +289,7 @@
                 <td class="col-xs-5">
                     ￥{{ route.price }}+{{ route.tax }}
                 </td>
-                <td class="col-xs-1"><input type="checkbox" ng-model="route.selected"/></td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="route.selected" ng-click="$event.stopPropagation()"/></td>
             </tr>
         </table>
 
@@ -328,7 +328,7 @@
             </tr>
         </table>
     </div>
-    <div><a class="fixed-footer" id="submit-products" href="{{test()}}"><span>提交</span></a></div>
+    <div><a class="fixed-footer" id="submit-products" href="{{getUrl()}}"><span>提交</span></a></div>
 
 
 </div>
