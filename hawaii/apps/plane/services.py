@@ -888,14 +888,16 @@ u'SC': u'山东航空',
 u'SA': u'南非航空',
 u'NW': u'美国西北航空',
 u'OS': u'毛利航空',
-    }
+u'SU': u'俄罗斯航空',
+u'HX': u'香港航空',
+}
     @classmethod
     def get_name(cls, three):
         return cls.companies.get(three, "")
 
 
 class Route(object):
-    def __init__(self, company, starting, destination, price, tax, flights=[]):
+    def __init__(self, company, starting, destination, price, tax, turn=0, flights=[]):
         self.company = company
         self.starting = starting
         self.destination = destination
@@ -904,6 +906,7 @@ class Route(object):
         self.price = price
         self.tax = tax
         self.flights = flights
+        self.turn = turn
 
     @classmethod
     def search(cls, starting, destination, departure, back_time="", seat_type="Y", **kwargs):
@@ -922,8 +925,14 @@ class Route(object):
         return cls.parse_xml(content)
 
     def to_json(self):
+        turn = self.turn
+        if not int(turn):
+            turn = u"直飞"
+        else:
+            turn = unicode(turn)
         return {
             "company": self.company,
+            "turn": turn,
             "starting": self.starting,
             "destination": self.destination,
             "departure": self.departure,
@@ -946,6 +955,12 @@ class Route(object):
             route_destination = City.get_name(route.find("t").text)
             route_company = Company.get_name(route.find("a").text)
 
+            route_turn_tag = route.find("zz")
+            if not route_turn_tag:
+                route_turn = 0
+            else:
+                route_turn = route_turn_tag.text[0]
+
             flights = []
             for route_segment in route_segments:
                 number = route_segment.find("no")
@@ -965,6 +980,7 @@ class Route(object):
                 flight_price = route_segment.find("m")
                 duration = route_segment.find("d").text
                 modal = route_segment.find("et").text
+                status = int(route_segment.find("dp").text)
 
                 flight_data = {
                     "number": number.text,
@@ -974,20 +990,21 @@ class Route(object):
                     "departure": "%s %s:%s" % (departure_date, departure_time[:2], departure_time[2:]),
                     "arrival": "%s %s:%s" % (arrival_date, arrival_time[:2], arrival_time[2:]),
                     "duration": duration,
-                    "modal": modal
+                    "modal": modal,
+                    "status": status
                 }
                 flight = Flight(**flight_data)
                 flights.append(flight)
             route = Route(route_company, route_starting,
                           route_destination, price=price,
-                          tax=tax, flights=flights)
+                          tax=tax, flights=flights, turn=route_turn)
             result_routes.append(route)
 
         return result_routes
 
 
 class Flight(object):
-    def __init__(self, number, staring, destination, company, departure, arrival, duration, modal, amount=1, **kwargs):
+    def __init__(self, number, staring, destination, company, departure, arrival, duration, modal, status=1, amount=1, **kwargs):
         self.number = number
         self.starting = staring
         self.destination = destination
@@ -997,6 +1014,7 @@ class Flight(object):
         self.duration = duration
         self.amount = amount
         self.modal = modal
+        self.status = status
 
     def to_json(self):
         return {
@@ -1008,7 +1026,8 @@ class Flight(object):
             "arrival": self.arrival,
             "amount": self.amount,
             "duration": self.duration,
-            "modal": self.modal
+            "modal": self.modal,
+            "status": self.status
         }
 
 

@@ -70,20 +70,15 @@
     height: 60px;
 }
 
-.fixed-footer a {
-    text-decoration: none;
-    color: #fff;
-}
-
 a:link{
     text-decoration: none;
-    color: #fff;
+    color: #428bca;
 
 }
 
 a:hover{
     text-decoration: none;
-    color: #fff;
+    color: #428bca;
 }
 
 a:visited {
@@ -92,6 +87,6 @@ a:visited {
 
 .fixed-footer span {
     display: block;
-    color: #fff;
+    color: #428bca;
     font-size: 1.2em;
 }

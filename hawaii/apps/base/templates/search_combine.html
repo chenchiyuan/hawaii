@@ -27,8 +27,8 @@
     function ValidateController($scope, $http, $location){
         $scope.user_count = 1;
         var default_user = {
-            "firstname": "姓",
-            "secondname": "名",
+            "firstname": "姓(英文)",
+            "secondname": "名(英文)",
             "gender": "m",
             "country": "中国",
             "birthday": "1980-01-01"
@@ -36,6 +36,8 @@
         $scope.users = [];
         $scope.users.push(angular.copy(default_user));
         $scope.phone = "";
+        $scope.contact = "";
+        $scope.email = "";
 
         $scope.countChange = function(){
             if($scope.user_count <= 1){
@@ -53,6 +55,9 @@
 
         $scope.submit = function(){
             var data = {
+                "contact": $scope.contact,
+                "email": $scope.email,
+                "user_count": $scope.user_count,
                 "phone": $scope.phone,
                 "users": $scope.users,
                 "products": window.products
@@ -64,9 +69,12 @@
     }
 </script>
 <script >
-    function SearchController($scope, $http, $modal) {
+    function SearchController($scope, $http, $modal, $location) {
         $scope.loadded = false;
-        $scope.user_checked = false;
+        $scope.routes = null;
+        $scope.hotels = null;
+        $scope.commodities = null;
+
         var querystring = location.href.substring(location.href.indexOf("?")+1);
         var request = $http({
             method: 'GET',
@@ -92,7 +100,7 @@
             });
         };
 
-        $scope.getUrl = function(){
+        $scope.submit = function(){
             var hotels = [];
             var routes = [];
             var commodities = [];
@@ -118,7 +126,7 @@
                 "commodities": commodities
             };
             window.products = products;
-            return "#validate";
+            $location.path("/validate");
         };
     }
 
@@ -262,7 +270,8 @@
 </head>
 <body ng-app="hawaii">
 <div ng-view></div>
-<script type="text/ng-template" id="products.html">
+            <script type="text/ng-template" id="products.html">
+
     <div class="data-wrapper" ng-controller="SearchController" id="search-controller">
     <div class="m-spin" ng-if = "!loadded">
       <div class="u-spin">
@@ -276,15 +285,23 @@
           <div class="bar8"></div>
       </div>
     </div>
-    <div class="products-wrapper container" ng-show="loadded & !user_checked">
-        <h3>航班</h3>
-        <table class="table table-hover routes" ng-repeat="route in routes">
-            <tr class="row" ng-class="{true:'success', false:''}[route.selected]" ng-click="openRoute(route)">
-                <td class="col-xs-2">
-                    {{ route.starting }}
-                </td>
+
+    <div class="products-wrapper container" ng-show="routes">
+        <h4>选择航班</h4>
+        <table class="table table-hover routes">
+            <tr class="row">
+                <td class="col-xs-4">航空公司</td>
+                <td class=col-xs-2">转机</td>
+                <td class="col-xs-5">价格</td>
+                <td class="col-xs-1"></td>
+            </tr>
+
+            <tr class="row" ng-class="{true:'success', false:''}[route.selected]" ng-click="openRoute(route)" ng-repeat="route in routes">
                 <td class="col-xs-4">
-                    {{ route.departure|date:'HH:mm' }} - {{ route.arrival|date:'HH:mm' }}
+                    {{ route.company }}
+                </td>
+                <td class="col-xs-2">
+                   {{ route.turn }}
                 </td>
                 <td class="col-xs-5">
                     ￥{{ route.price }}+{{ route.tax }}
@@ -294,25 +311,8 @@
         </table>
 
     </div>
-    <div class="products-wrapper container" ng-show="loadded & !user_checked">
-        <h3>酒店</h3>
-        <table class="table table-hover">
-            <tr class="row">
-                <td class="col-xs-5">酒店名</td>
-                <td class="col-xs-3">类型</td>
-                <td class="col-xs-3">价格</td>
-                <td class="col-xs-1"></td>
-            </tr>
-            <tr class="row" ng-class="{true:'success', false:''}[hotel.selected]" ng-repeat="hotel in hotels">
-                <td class="col-xs-5">{{ hotel.name }}</td>
-                <td class="col-xs-3">{{ hotel.inventory_type }}</td>
-                <td class="col-xs-3">{{ hotel.price }}</td>
-                <td class="col-xs-1"><input type="checkbox" ng-model="hotel.selected"/></td>
-            </tr>
-        </table>
-    </div>
-    <div class="products-wrapper container" ng-show="loadded & !user_checked">
-        <h3>目的地产品</h3>
+    <div class="products-wrapper container" ng-show="routes && commodities">
+        <h4>优惠促销</h4>
         <table class="table table-hover">
             <tr class="row">
                 <td class="col-xs-5">产品名</td>
@@ -328,7 +328,28 @@
             </tr>
         </table>
     </div>
-    <div><a class="fixed-footer" id="submit-products" href="{{getUrl()}}"><span>提交</span></a></div>
+    <div class="products-wrapper container" ng-show="routes && hotels">
+        <h4>特价酒店</h4>
+        <table class="table table-hover">
+            <tr class="row">
+                <td class="col-xs-5">酒店名</td>
+                <td class="col-xs-3">类型</td>
+                <td class="col-xs-3">价格</td>
+                <td class="col-xs-1"></td>
+            </tr>
+            <tr class="row" ng-class="{true:'success', false:''}[hotel.selected]" ng-repeat="hotel in hotels">
+                <td class="col-xs-5">{{ hotel.name }}</td>
+                <td class="col-xs-3">{{ hotel.inventory_type }}</td>
+                <td class="col-xs-3">{{ hotel.price }}</td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="hotel.selected"/></td>
+            </tr>
+        </table>
+    </div>
+    <div>
+             <div class="col-xs-12" style="margin-top: 10px;" ng-show="loadded">
+                <button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="submit()">预定</button>
+            </div>
+    </div>
 
 
 </div>
@@ -337,11 +358,12 @@
 <script type="text/ng-template" id="validate.html">
 
 <form class="form-horizontal" role="form" ng-controller="ValidateController" id="validate-controller" ng-submit="submit()">
+
     <div class="form-group">
-        <label for="user_count" class="col-xs-3 control-label"><span>出行人数</span>
+        <label for="contact" class="col-xs-3 control-label"><span>联系人</span>
         </label>
         <div class="col-xs-9">
-            <input type="number" class="form-control" id="user_count" ng-model="user_count" ng-change="countChange()" name="user_count" placeholder="{{ user_count }}">
+            <input type="text" class="form-control" id="contact" ng-model="contact" name="contact" placeholder="{{ contact }}">
         </div>
     </div>
     <div class="form-group">
@@ -349,6 +371,20 @@
         </label>
         <div class="col-xs-9">
             <input type="phone" class="form-control" id="phone" ng-model="phone" name="phone" placeholder="{{ phone }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="email" class="col-xs-3 control-label"><span>邮箱</span>
+        </label>
+        <div class="col-xs-9">
+            <input type="email" class="form-control" id="email" ng-model="email" name="email" placeholder="{{ email }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="user_count" class="col-xs-3 control-label"><span>旅客人数</span>
+        </label>
+        <div class="col-xs-9">
+            <input type="number" class="form-control" id="user_count" ng-model="user_count" ng-change="countChange()" name="user_count" placeholder="{{ user_count }}">
         </div>
     </div>
     <hr/>
@@ -402,8 +438,8 @@
         <hr/>
     </div>
     <div class="form-group">
-        <div class="col-xs-12" style="text-align: center;">
-            <button type="submit" class="btn btn-default">提交</button>
+        <div class="col-xs-12">
+            <button type="submit" class="btn btn-primary btn-lg btn-block">提交</button>
         </div>
     </div>
 </form>
@@ -411,20 +447,47 @@
 
 <script type="text/ng-template" id="success.html">
     <div class="alert alert-success">
-        您的订单已经提交给客服！稍后会有客服联系您，谢谢！
+        您的订单已提交！客服人员将尽快与您联系，谢谢！
+        </br>   如果您有任何问题可拨打热线010-85227835
     </div>
 </script>
 
 <script type="text/ng-template" id="modal.html">
-        <div class="modal-header" ng-model="route">
-            <h3>{{ route.number }}</h3>
-        </div>
         <div class="modal-body">
+        <h3>去程: {{ route.starting }} - {{ route.destination }}</h3>
         <table ng-model="route">
             <tr class="row">
                 <td>
                     <div class="container">
-                        <table class="table" ng-repeat="flight in route.flights">
+                        <table class="table" ng-repeat="flight in route.flights|filter:{status:1} ">
+                            <tr class="row">
+                                <td class="col-xs-6">航空公司: {{ flight.company }}</td>
+                                <td class="col-xs-6">航班号: {{ flight.number }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">机型: {{ flight.modal }}</td>
+                                <td class="col-xs-6">飞行时间: {{ flight.duration }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">起飞机场: {{ flight.starting }}</td>
+                                <td class="col-xs-6">抵达机场: {{ flight.destination }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">起飞时间: {{ flight.departure|date:'yyyy-MM-dd HH:mm' }}</td>
+                                <td class="col-xs-6">抵达时间: {{ flight.arrival|date:'yyyy-MM-dd HH:mm' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <h3>回程: {{ route.destination }} - {{ route.starting }}</h3>
+        <table ng-model="route">
+            <tr class="row">
+                <td>
+                    <div class="container">
+                        <table class="table" ng-repeat="flight in route.flights|filter:{status:0} ">
                             <tr class="row">
                                 <td class="col-xs-6">航空公司: {{ flight.company }}</td>
                                 <td class="col-xs-6">航班号: {{ flight.number }}</td>
@@ -448,7 +511,7 @@
         </table>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-primary" ng-click="ok()">关闭</button>
         </div>
 </script>
 

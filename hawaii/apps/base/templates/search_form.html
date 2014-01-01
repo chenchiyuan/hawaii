@@ -1,4 +1,12 @@
 {% extends "base.html" %}
+{% block link %}
+    <script type="text/javascript" src="/static/js/angular-1.2.3/angular.min.js"></script>
+    <script>
+        function FormController($scope){
+            $scope.status = 0;
+        }
+    </script>
+{% endblock %}
 
 {% block title %}
     航班搜索
@@ -9,10 +17,25 @@
 {% endblock %}
 
 {% block body %}
-    <form class="form-horizontal" role="form" action="/products/" method="get">
+{% verbatim %}
+
+    <form class="form-horizontal" role="form" action="/products/" method="get" ng-app
+            ng-controller="FormController" id="form-controller">
         <div class="form-group">
-            <label for="starting" class="col-sm-2 control-label"><span><i class="icon-plane"> 出发城市</i></span></label>
-            <div class="col-sm-10">
+            <label for="status" class="col-xs-4 control-label"><span><i class="icon-suitcase"> 单程</i></span>
+            </label>
+            <div class="col-xs-2">
+                <input type="radio" ng-model="status" value="0"/>
+            </div>
+            <label for="status" class="col-xs-4 control-label"><span><i class="icon-suitcase"> 往返</i></span>
+            </label>
+            <div class="col-xs-2">
+                <input type="radio" ng-model="status" value="1"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="starting" class="col-xs-4 control-label"><span><i class="icon-plane"> 出发城市</i></span></label>
+            <div class="col-xs-8">
                 <select class="form-control" name="starting" id="staring">
                     <option value="BJS">北京</option>
                     <option value="SHA">上海</option>
@@ -27,9 +50,9 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="destination" class="col-sm-2 control-label"><span><i class="icon-fighter-jet"> 到达城市</i></span>
+            <label for="destination" class="col-xs-4 control-label"><span><i class="icon-fighter-jet"> 到达城市</i></span>
             </label>
-            <div class="col-sm-10">
+            <div class="col-xs-8">
                 <select class="form-control" name="destination" id="destination">
                     <option value="HNL">夏威夷</option>
                     <option value="HKG">香港</option>
@@ -40,30 +63,30 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="departure" class="col-sm-2 control-label"><span><i class="icon-calendar"> 出发时间</i></span>
+            <label for="departure" class="col-xs-4 control-label"><span><i class="icon-calendar"> 出发日期</i></span>
             </label>
-            <div class="col-sm-10">
+            <div class="col-xs-8">
                 <input type="date" class="form-control" id="departure" name="departure" placeholder="请选择出发时间">
             </div>
         </div>
-        <div class="form-group">
-            <label for="back_time" class="col-sm-2 control-label"><span><i class="icon-calendar"> 返回时间</i></span>
+        <div class="form-group" ng-show="status">
+            <label for="back_time" class="col-xs-4 control-label"><span><i class="icon-calendar"> 返回日期</i></span>
             </label>
-            <div class="col-sm-10">
+            <div class="col-xs-8">
                 <input type="date" class="form-control" id="back_time" name="back_time" placeholder="请选择出发时间">
             </div>
         </div>
         <div class="form-group">
-            <label for="amount" class="col-sm-2 control-label"><span><i class="icon-user-md"> 人数</i></span>
+            <label for="amount" class="col-xs-4 control-label"><span><i class="icon-user-md"> 人数</i></span>
             </label>
-            <div class="col-sm-10">
+            <div class="col-xs-8">
                 <input type="number" class="form-control" id="amount" name="amount" placeholder="1">
             </div>
         </div>
         <div class="form-group">
-            <label for="seat_type" class="col-sm-2 control-label"><span><i class="icon-suitcase"> 座位</i></span>
+            <label for="seat_type" class="col-xs-4 control-label"><span><i class="icon-suitcase"> 舱位</i></span>
             </label>
-            <div class="col-sm-10">
+            <div class="col-xs-8">
                 <select class="form-control" name="seat_type" id="seat_type">
                     <option value="Y">经济舱</option>
                     <option value="C">商务舱</option>
@@ -72,9 +95,10 @@
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-default">查询</button>
+            <div class="col-xs-12" style="margin-top: 10px;">
+                <button type="submit" class="btn btn-primary btn-lg btn-block">查询</button>
             </div>
         </div>
     </form>
+{% endverbatim %}
 {% endblock %}

@@ -55,12 +55,15 @@ class ConfirmProductsView(View):
             contents.append(content)
         return "</br>".join(contents)
 
-    def get_html(self, phone="", users=[], products=[], **kwargs):
+    def get_html(self, phone="", users=[], products={}, **kwargs):
         html = []
-        phone_html = "手机号: %s" % phone
+        contact = kwargs.get("contact", "")
+        email = kwargs.get("email", "")
+        user_count = kwargs.get("user_count", "")
+        contact_html = "联系人: %s, 手机号: %s, 邮箱: %s, 出行人数: %s" % (contact, phone, email, user_count)
         users_html = self.users(users)
         routes_html = self.routes(products.get("routes", []))
-        html.extend([phone_html, users_html, routes_html])
+        html.extend([contact_html, users_html, routes_html])
         return "</br>".join(html)
 
 class SearchProductsView(TemplateView):
@@ -73,7 +76,7 @@ class SearchFormView(TemplateView):
 
 class SearchQueryView(View):
     def get(self, request, *args, **kwargs):
-        page_size = 3
+        page_size = 5
 
         query_dict = self.get_route_query_dict(request, *args, **kwargs)
         city = City.get_name(query_dict.get("destination", ""))
@@ -87,6 +90,16 @@ class SearchQueryView(View):
             commodities = map(lambda commodity: commodity.to_json(),
                               list(CommodityProduct.objects.filter(city=city)))
         routes = map(lambda route: route.to_json(), routes_search)
+
+        def cmp(a, b):
+            price_a = int(a['price']) + int(a['tax'])
+            price_b = int(b['price']) + int(b['tax'])
+            if price_a <= price_b:
+                return -1
+            else:
+                return 1
+        routes = sorted(routes, cmp=cmp)
+
         return json_response({
             "hotels": hotels[:page_size],
             "commodities": commodities[:page_size],
