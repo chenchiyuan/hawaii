@@ -6,6 +6,7 @@ from __future__ import division, unicode_literals, print_function
 from django.db import models
 from hawaii import const
 from hawaii.apps.ueditor.fields import UEditorField
+from hawaii.apps.weixin.libs.formatters import BasicFormatter
 
 
 class Hotel(models.Model):
@@ -27,6 +28,15 @@ class Hotel(models.Model):
             "city": self.city,
             "html": self.information
         }
+
+    def save(self, force_insert=False, force_update=False, using=None):
+        if self.information:
+            try:
+                self.information = BasicFormatter.format(self.information)
+            except:
+                pass
+        super(Hotel, self).save(force_insert, force_update, using)
+
 
 class HotelDay(models.Model):
     class Meta:

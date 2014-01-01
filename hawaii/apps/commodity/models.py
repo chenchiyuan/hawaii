@@ -6,6 +6,7 @@ from __future__ import division, unicode_literals, print_function
 from django.db import models
 from hawaii import const
 from hawaii.apps.ueditor.fields import UEditorField
+from hawaii.apps.weixin.libs.formatters import BasicFormatter
 
 
 class Commodity(models.Model):
@@ -19,6 +20,14 @@ class Commodity(models.Model):
     name = models.CharField(u"商品名", max_length=const.DB_NORMAL_LENGTH, db_index=True)
     city = models.CharField(u"城市", max_length=const.DB_NORMAL_LENGTH)
     information = UEditorField(u"正文", default="", blank=True, null=True)
+
+    def save(self, force_insert=False, force_update=False, using=None):
+        if self.information:
+            try:
+                self.information = BasicFormatter.format(self.information)
+            except:
+                pass
+        super(Commodity, self).save(force_insert, force_update, using)
 
 
 class CommodityDay(models.Model):
