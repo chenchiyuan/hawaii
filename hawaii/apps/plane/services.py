@@ -818,7 +818,7 @@ u'KGL': u'基加利',
 
     @classmethod
     def get_name(cls, three):
-        return cls.cities.get(three, "")
+        return cls.cities.get(three, three)
 
 
 class Company(object):
@@ -893,7 +893,7 @@ u'HX': u'香港航空',
 }
     @classmethod
     def get_name(cls, three):
-        return cls.companies.get(three, "")
+        return cls.companies.get(three, three)
 
 
 class Route(object):
