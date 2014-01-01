@@ -94,7 +94,7 @@ class RichText(models.Model, QuerysetMixin):
     photo = models.ForeignKey(Photo, verbose_name="封面图片")
     rules = models.ManyToManyField(Rule, verbose_name=u"关键字", help_text=u"匹配到的关键字",
                                    blank=True, null=True)
-    link = models.CharField(u"链接", max_length=128, blank=True, null=True,
+    link = models.CharField(u"链接", max_length=1024, blank=True, null=True,
                             help_text="添加链接后不显示正文内容，直接跳转到该链接。")
     priority = models.IntegerField(u"优先级", default=0, blank=True, null=True,
                                    help_text=u"数字越大，显示越靠前", )

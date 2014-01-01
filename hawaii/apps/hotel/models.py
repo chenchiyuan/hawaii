@@ -20,6 +20,13 @@ class Hotel(models.Model):
     city = models.CharField(u"城市", max_length=const.DB_NORMAL_LENGTH)
     information = UEditorField(u"正文", default="", blank=True, null=True)
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "city": self.city,
+            "information": self.information
+        }
 
 class HotelDay(models.Model):
     class Meta:
