@@ -28,6 +28,28 @@
 
     function ValidateController($scope, $http, $location){
         $scope.format = 'yyyy-MM-dd';
+        var isMobile = {
+            Android: function() {
+                return navigator.userAgent.match(/Android/i);
+            },
+            BlackBerry: function() {
+                return navigator.userAgent.match(/BlackBerry/i);
+            },
+            iOS: function() {
+                return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+            },
+            Opera: function() {
+                return navigator.userAgent.match(/Opera Mini/i);
+            },
+            Windows: function() {
+                return navigator.userAgent.match(/IEMobile/i);
+            },
+            any: function() {
+                return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+            }
+        };
+        $scope.is_android = isMobile.Android();
+
         $scope.user_count = 1;
         var default_user = {
             "firstname": "姓(英文)",
@@ -467,7 +489,9 @@
                         ng-required="true" class="form-control"
                         show_weeks="false" day-title-format="yyyy-MM"
                         current-text="今天" toggle-weeks-text="周" clear-text="清空" close-text="完成
-                        id="birthday" name="birthday" ng-model="users[$index].birthday" placeholder="">
+                        id="birthday" name="birthday" ng-model="users[$index].birthday" placeholder="" ng-if="is_android">
+                <input type="date" class="form-control" id="birthday" name="birthday" ng-model="users[$index].birthday" placeholder="" ng-if="!is_android">
+
             </div>
         </div>
         <hr/>

@@ -11,6 +11,29 @@
             $scope.departure = new Date();
             $scope.back_time = "";
             $scope.format = "yyyy-MM-dd";
+
+            var isMobile = {
+                Android: function() {
+                    return navigator.userAgent.match(/Android/i);
+                },
+                BlackBerry: function() {
+                    return navigator.userAgent.match(/BlackBerry/i);
+                },
+                iOS: function() {
+                    return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+                },
+                Opera: function() {
+                    return navigator.userAgent.match(/Opera Mini/i);
+                },
+                Windows: function() {
+                    return navigator.userAgent.match(/IEMobile/i);
+                },
+                any: function() {
+                    return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+                }
+            };
+            $scope.is_android = isMobile.Android();
+
         }
     </script>
     <script>
@@ -85,17 +108,21 @@
                 <input type="text" ng-model="departure" datepicker-popup="{{format}}"
                        ng-required="true" class="form-control" min="{{ today }}"
                        id="departure" name="departure" show_weeks="false" day-title-format="yyyy-MM"
-                       current-text="今天" toggle-weeks-text="周" clear-text="清空" close-text="完成">
+                       current-text="今天" toggle-weeks-text="周" clear-text="清空" close-text="完成" ng-if="is_android">
+                <input type="date" class="form-control" id="departure" name="departure" placeholder="请选择出发时间" ng-if="!is_android">
+
             </div>
+
         </div>
         <div class="form-group" ng-show="status">
             <label for="back_time" class="col-xs-4 control-label"><span><i class="icon-calendar"> 返回日期</i></span>
             </label>
             <div class="col-xs-8">
-               <input type="text" ng-model="back_time" datepicker-popup="{{format}}"
+                <input type="text" ng-model="back_time" datepicker-popup="{{format}}"
                        ng-required="true" class="form-control" min="{{ today }}"
                        id="back_time" name="back_time" show_weeks="false" day-title-format="yyyy-MM"
-                       current-text="今天" toggle-weeks-text="周" clear-text="清空" close-text="完成">
+                       current-text="今天" toggle-weeks-text="周" clear-text="清空" close-text="完成" ng-if="is_android">
+                <input type="date" class="form-control" id="back_time" name="back_time" placeholder="请选择出发时间" ng-if="!is_android">
             </div>
         </div>
         <div class="form-group">
