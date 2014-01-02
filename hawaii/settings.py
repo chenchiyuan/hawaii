@@ -18,6 +18,8 @@ ADMINS = (
     ('Shadow', 'chenchiyuan03@gmail.com'),
 )
 
+EMAIL_TO = config.get("hawaii", "email_to")
+
 MANAGERS = ADMINS
 
 DATABASES = {

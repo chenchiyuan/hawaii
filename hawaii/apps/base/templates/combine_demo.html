@@ -1,121 +1,76 @@
 <!doctype html>
-<html ng-app lang="zh-cn">
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<html ng-app="plunker">
+  <head>
     <script src="http://cdn.staticfile.org/angular.js/1.2.5/angular.min.js"></script>
+    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.9.0.js"></script>
     <script >
-        function SearchController($scope) {
-            $scope.hotels = [
-                {name:'希尔顿酒店', selected:true},
-                {name:'七天连锁', selected:false}
-            ];
 
-            $scope.commodities = [
-                {"name": "一日游", selected:true},
-                {"name": "二日游", selected:false}
-            ];
+        angular.module('plunker', ['ui.bootstrap']);
+var ModalDemoCtrl = function ($scope, $modal, $log) {
 
-            $scope.getUrl = function(){
-                var base_url = "http://baidu.com";
-                var hotels = [];
-                var commodities = [];
-                angular.forEach($scope.hotels, function(hotel){
-                   if(hotel.selected){
-                       hotels.push(hotel);
-                   }
-                });
-                if(typeof hotels !== 'undefined' && hotels.length > 0){
-                    return "http://baidu.com";
-                }else{
-                    return "http://google.com";
-                }
-            };
+  $scope.items = ['item1', 'item2', 'item3'];
+
+  $scope.open = function () {
+
+    var modalInstance = $modal.open({
+      templateUrl: 'myModalContent.html',
+      controller: ModalInstanceCtrl,
+      resolve: {
+        items: function () {
+          return $scope.items;
         }
+      }
+    });
 
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      $log.info('Modal dismissed at: ' + new Date());
+    });
+  };
+};
+
+var ModalInstanceCtrl = function ($scope, $modalInstance, items) {
+
+  $scope.items = items;
+  $scope.selected = {
+    item: $scope.items[0]
+  };
+
+  $scope.ok = function () {
+    $modalInstance.close($scope.selected.item);
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+};
     </script>
-    <style type="text/css">
-        .selected-true {
-            text-decoration: line-through;
-            color: grey;
-        }
-        .body {
-            margin-bottom: 60px;
-        }
-        .fixed-footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #3fbc48;
-            font-size: 1.2em;
-            text-align: center;
-            padding: 15px 0;
-            height: 60px;
-        }
-        .fixed-footer a {
-            text-decoration: none;
-            color: #fff;
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
 
-        }
-        a:link{
-            text-decoration: none;
-            color: #fff;
-
-        }
-
-        a:hover{
-            text-decoration: none;
-            color: #fff;
-        }
-
-        a:visited {
-            text-decoration: none;
-        }
-
-        .fixed-footer span {
-            display: block;
-            color: #fff;
-            font-size: 1.2em;
-        }
-    </style>
-    <script>
-        function submit(){
-            hotel_scope = angular.element(document.getElementById('hotel-controller')).scope();
-            console.log(hotel_scope.hotels);
-            alert(hotel_scope.hotels);
-        }
+<div ng-controller="ModalDemoCtrl">
+    <script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-header">
+            <h3>I'm a modal!</h3>
+        </div>
+        <div class="modal-body">
+            <ul>
+                <li ng-repeat="item in items">
+                    <a ng-click="selected.item = item">{{ item }}</a>
+                </li>
+            </ul>
+            Selected: <b>{{ selected.item }}</b>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
     </script>
-</head>
-<body>
-<div class="data-wrapper" ng-controller="SearchController" id="search-controller">
-    <div class="products-wrapper container">
-        <h3>酒店</h3>
-        <table class="table table-hover">
-            <tr class="row">
-                <td class="col-xs-6">酒店名</td>
-                <td class="col-xs-6">选中</td>
-            </tr>
-            <tr class="row" ng-class="{true:'success', false:''}[hotel.selected]" ng-repeat="hotel in hotels">
-                <td class="col-xs-6">{{ hotel.name }}</td>
-                <td class="col-xs-6"><input type="checkbox" ng-model="hotel.selected"/></td>
-            </tr>
-        </table>
-    </div>
-    <div class="products-wrapper container">
-        <h3>目的地产品</h3>
-        <table class="table table-hover">
-            <tr class="row">
-                <td class="col-xs-6">产品名</td>
-                <td class="col-xs-6">选中</td>
-            </tr>
-            <tr class="row" ng-class="{true:'success', false:''}[commodity.selected]" ng-repeat="commodity in commodities">
-                <td class="col-xs-6">{{ commodity.name }}</td>
-                <td class="col-xs-6"><input type="checkbox" ng-model="commodity.selected"/></td>
-            </tr>
-        </table>
-    </div>
-    <div><a class="fixed-footer" id="submit-products" href="{{getUrl()}}"><span>提交</span></a></div>
+
+    <button class="btn btn-default" ng-click="open()">Open me!</button>
+    <div ng-show="selected">Selection from a modal: {{ selected }}</div>
 </div>
-</body>
+  </body>
 </html>

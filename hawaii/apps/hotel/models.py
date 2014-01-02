@@ -6,6 +6,7 @@ from __future__ import division, unicode_literals, print_function
 from django.db import models
 from hawaii import const
 from hawaii.apps.ueditor.fields import UEditorField
+from hawaii.apps.weixin.libs.formatters import BasicFormatter
 
 
 class Hotel(models.Model):
@@ -19,6 +20,22 @@ class Hotel(models.Model):
     name = models.CharField(u"酒店名", max_length=const.DB_NORMAL_LENGTH, db_index=True)
     city = models.CharField(u"城市", max_length=const.DB_NORMAL_LENGTH)
     information = UEditorField(u"正文", default="", blank=True, null=True)
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "city": self.city,
+            "html": self.information
+        }
+
+    def save(self, force_insert=False, force_update=False, using=None):
+        if self.information:
+            try:
+                self.information = BasicFormatter.format(self.information)
+            except:
+                pass
+        super(Hotel, self).save(force_insert, force_update, using)
 
 
 class HotelDay(models.Model):
@@ -127,5 +144,6 @@ class HotelProduct(models.Model):
             "inventory_type": self.inventory_type,
             "price": self.price,
             "breakfast": self.breakfast,
-            "remark": self.remark
+            "remark": self.remark,
+            "html": self.inventory.hotel.information
         }

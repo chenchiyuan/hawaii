@@ -1,176 +1,591 @@
 <!doctype html>
 {% verbatim %}
-<html ng-app lang="zh-cn">
+<html lang="zh-cn">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta charset="UTF-8">
-    <link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <script src="http://cdn.staticfile.org/angular.js/1.2.5/angular.min.js"></script>
-    <script >
-        function SearchController($scope, $http) {
-            var querystring = location.href.substring(location.href.indexOf("?")+1);
-            var request = $http({
-                method: 'GET',
-                url: '/search/' + "?" + querystring
-            });
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8">
+<link href="http://cdn.staticfile.org/twitter-bootstrap/3.0.0-rc2/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="/static/js/angular-1.2.6/angular.min.js"></script>
+<script type="text/javascript" src="/static/js/angular-1.2.6/angular-route.min.js"></script>
+<script type="text/javascript" src="/static/js/angular-1.2.6/angular-sanitize.min.js"></script>
 
-            request.success(function(response, status, headers, config){
-                $scope.routes = response.routes;
-                $scope.hotels = response.hotels;
-                $scope.commodities = response.commodities;
-            });
+<script type="text/javascript" src="/static/js/ui-bootstrap-tpls-0.9.0.js"></script>
 
+<script>
+    angular.module('hawaii',['ngRoute', 'ui.bootstrap', 'ngSanitize'])
+            .config(['$routeProvider', function($routeProvider) {
+                $routeProvider.
+                        when('/', {templateUrl: 'products.html', controller: SearchController}).
+                        when('/validate', {templateUrl: 'validate.html', controller: ValidateController}).
+                        when('/success', {templateUrl: 'success.html', controller: SuccessController}).
+                        otherwise({redirectTo: '/'});
+            }]);
+</script>
+<script>
+    function SuccessController($scope){
 
-            $scope.getUrl = function(){
-                var base_url = "http://baidu.com";
-                var hotels = [];
-                var commodities = [];
-                angular.forEach($scope.hotels, function(hotel){
-                   if(hotel.selected){
-                       hotels.push(hotel);
-                   }
-                });
-                if(typeof hotels !== 'undefined' && hotels.length > 0){
-                    return "http://baidu.com";
-                }else{
-                    return "http://google.com";
+    }
+
+    function ValidateController($scope, $http, $location){
+        $scope.format = 'yyyy-MM-dd';
+        var isMobile = {
+            Android: function() {
+                return navigator.userAgent.match(/Android/i);
+            },
+            BlackBerry: function() {
+                return navigator.userAgent.match(/BlackBerry/i);
+            },
+            iOS: function() {
+                return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+            },
+            Opera: function() {
+                return navigator.userAgent.match(/Opera Mini/i);
+            },
+            Windows: function() {
+                return navigator.userAgent.match(/IEMobile/i);
+            },
+            any: function() {
+                return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+            }
+        };
+        $scope.is_android = isMobile.Android();
+
+        $scope.user_count = 1;
+        var default_user = {
+            "firstname": "姓(英文)",
+            "secondname": "名(英文)",
+            "gender": "m",
+            "country": "中国",
+            "birthday": "1981-01-01"
+        };
+        $scope.users = [];
+        $scope.users.push(angular.copy(default_user));
+        $scope.phone = "";
+        $scope.contact = "";
+        $scope.email = "";
+
+        $scope.countChange = function(){
+            if($scope.user_count <= 1){
+                $scope.users = $scope.users.slice(0, 1);
+            }
+            else if($scope.users.length >= $scope.user_count){
+                $scope.users = $scope.users.slice(0, $scope.user_count);
+            }else{
+                var push_count = $scope.user_count - $scope.users.length;
+                for(var i=0; i<push_count; i++){
+                    $scope.users.push(angular.copy(default_user));
                 }
+            }
+        };
+
+        $scope.submit = function(){
+            var data = {
+                "contact": $scope.contact,
+                "email": $scope.email,
+                "user_count": $scope.user_count,
+                "phone": $scope.phone,
+                "users": $scope.users,
+                "products": window.products
             };
-        }
+            $http.post("/confirm/", data).success(function(data, status, headers, config){
+                $location.path("/success");
+            });
+        };
+    }
+</script>
+<script >
+    function SearchController($scope, $http, $modal, $location) {
+        $scope.loadded = false;
+        $scope.routes = null;
+        $scope.hotels = null;
+        $scope.commodities = null;
 
-    </script>
-    <style type="text/css">
-        .selected-true {
-            text-decoration: line-through;
-            color: grey;
-        }
-        .body {
-            margin-bottom: 60px;
-        }
-        .fixed-footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: #3fbc48;
-            font-size: 1.2em;
-            text-align: center;
-            padding: 15px 0;
-            height: 60px;
-        }
-        .fixed-footer a {
-            text-decoration: none;
-            color: #fff;
+        var querystring = location.href.substring(location.href.indexOf("?")+1);
+        var request = $http({
+            method: 'GET',
+            url: '/search/' + "?" + querystring
+        });
 
-        }
-        a:link{
-            text-decoration: none;
-            color: #fff;
+        request.success(function(response, status, headers, config){
+            $scope.routes = response.routes;
+            $scope.hotels = response.hotels;
+            $scope.commodities = response.commodities;
+            $scope.loadded = true;
+        });
 
-        }
+        $scope.openRoute = function(route) {
+            var modalInstance = $modal.open({
+                templateUrl: 'modal.html',
+                controller: ModalInstanceCtrl,
+                resolve: {
+                    route: function () {
+                        return route;
+                    }
+                }
+            });
+        };
 
-        a:hover{
-            text-decoration: none;
-            color: #fff;
-        }
+        $scope.openHtml = function(item) {
+            var modalInstance = $modal.open({
+                templateUrl: 'detail.html',
+                controller:  ModalDetailController,
+                resolve: {
+                    item: function(){
+                        return item;
+                    }
+                }
+            });
+        };
 
-        a:visited {
-            text-decoration: none;
-        }
+        $scope.submit = function(){
+            var hotels = [];
+            var routes = [];
+            var commodities = [];
+            angular.forEach($scope.hotels, function(hotel){
+                if(hotel.selected){
+                    hotel.html = "";
+                    hotels.push(hotel);
+                }
+            });
+            angular.forEach($scope.routes, function(route){
+                if(route.selected){
+                    routes.push(route);
+                }
+            });
+            angular.forEach($scope.commodities, function(commodity){
+                if(commodity.selected){
+                    commodity.html = "";
+                    commodities.push(commodity);
+                }
+            });
 
-        .fixed-footer span {
-            display: block;
-            color: #fff;
-            font-size: 1.2em;
-        }
+            var products = {
+                "hotels": hotels,
+                "routes": routes,
+                "commodities": commodities
+            };
+            window.products = products;
+            $location.path("/validate");
+        };
+    }
 
-        .routes thead>tr>th, .routes tbody>tr>th, .routes tfoot>tr>th, .routes thead>tr>td, .routes tbody>tr>td, .routes tfoot>tr>td {
-            vertical-align: middle;
+    function ModalInstanceCtrl($scope, $modalInstance, route) {
+
+        $scope.route = route;
+
+        $scope.ok = function () {
+            $modalInstance.dismiss('cancel');
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    };
+
+    function ModalDetailController($scope, $modalInstance, item, $sce) {
+        console.log(item);
+        $scope.item = item;
+
+        $scope.ok = function () {
+            $modalInstance.dismiss('cancel');
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    };
+
+</script>
+<style type="text/css">
+    body {
+        margin-bottom: 60px;
+    }
+    .fixed-footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #3fbc48;
+        font-size: 1.2em;
+        text-align: center;
+        padding: 15px 0;
+        height: 60px;
+    }
+    .fixed-footer a {
+        text-decoration: none;
+        color: #fff;
+
+    }
+    a:link{
+        text-decoration: none;
+        color: #fff;
+
+    }
+
+    a:hover{
+        text-decoration: none;
+        color: #fff;
+    }
+
+    a:visited {
+        text-decoration: none;
+    }
+
+    .fixed-footer span {
+        display: block;
+        color: #fff;
+        font-size: 1.2em;
+    }
+
+    .routes thead>tr>th, .routes tbody>tr>th, .routes tfoot>tr>th, .routes thead>tr>td, .routes tbody>tr>td, .routes tfoot>tr>td {
+        vertical-align: middle;
+    }
+</style>
+<style type="text/css">
+    .m-spin {
+        z-index: 2;
+        width: 150px;
+        height: 150px;
+        border-radius: 10px;
+        background-color: rgba(0, 0, 0, 0.6);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: -75px;
+        margin-top: -75px;
+    }
+    .m-spin .u-spin {
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: -50px;
+        margin-top: -50px;
+        -webkit-animation-name: rotateThis;
+        -webkit-animation-duration: 2s;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-timing-function: linear;
+    }
+    .m-spin .u-spin div {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: #FFF;
+        -webkit-border-radius: 40px;
+        left: 40px;
+        top: 40px;
+    }
+    .m-spin .u-spin .bar1 {
+        -webkit-transform: rotate(0deg) translate(0, -40px);
+        opacity: .12;
+    }
+    .m-spin .u-spin .bar2 {
+        -webkit-transform: rotate(45deg) translate(0, -40px);
+        opacity: .25;
+    }
+    .m-spin .u-spin .bar3 {
+        -webkit-transform: rotate(90deg) translate(0, -40px);
+        opacity: .37;
+    }
+    .m-spin .u-spin .bar4 {
+        -webkit-transform: rotate(135deg) translate(0, -40px);
+        opacity: .5;
+    }
+    .m-spin .u-spin .bar5 {
+        -webkit-transform: rotate(180deg) translate(0, -40px);
+        opacity: .62;
+    }
+    .m-spin .u-spin .bar6 {
+        -webkit-transform: rotate(225deg) translate(0, -40px);
+        opacity: .75;
+    }
+    .m-spin .u-spin .bar7 {
+        -webkit-transform: rotate(270deg) translate(0, -40px);
+        opacity: .87;
+    }
+    .m-spin .u-spin .bar8 {
+        -webkit-transform: rotate(315deg) translate(0, -40px);
+        opacity: 1;
+    }
+    @-webkit-keyframes rotateThis {
+        from {
+            -webkit-transform: scale(0.5) rotate(0deg);
         }
-    </style>
-    <script>
-        function submit(){
-            hotel_scope = angular.element(document.getElementById('hotel-controller')).scope();
-            console.log(hotel_scope.hotels);
-            alert(hotel_scope.hotels);
+        to {
+            -webkit-transform: scale(0.5) rotate(360deg);
         }
-    </script>
+    }
+
+    .form_root {
+        border: 1px;
+    }
+</style>
 </head>
-<body>
-<div class="data-wrapper" ng-controller="SearchController" id="search-controller">
-     <div class="products-wrapper container">
-        <h3>航班</h3>
+<body ng-app="hawaii">
+<div ng-view></div>
+<script type="text/ng-template" id="products.html">
+
+    <div class="data-wrapper" ng-controller="SearchController" id="search-controller">
+    <div class="m-spin" ng-if = "!loadded">
+      <div class="u-spin">
+          <div class="bar1"></div>
+          <div class="bar2"></div>
+          <div class="bar3"></div>
+          <div class="bar4"></div>
+          <div class="bar5"></div>
+          <div class="bar6"></div>
+          <div class="bar7"></div>
+          <div class="bar8"></div>
+      </div>
+    </div>
+
+    <div class="products-wrapper container" ng-show="routes">
+        <h4>选择航班</h4>
         <table class="table table-hover routes">
-            <tr class="row" ng-class="{true:'success', false:''}[route.selected]" ng-repeat="route in routes">
+            <tr class="row success">
+                <td class="col-xs-4"><strong>航空公司</strong></td>
+                <td class=col-xs-2"><strong>转机</strong></td>
+                <td class="col-xs-5"><strong>价格</strong></td>
+                <td class="col-xs-1"></td>
+            </tr>
+
+            <tr class="row" ng-class="{true:'success', false:''}[route.selected]" ng-click="openRoute(route)" ng-repeat="route in routes">
                 <td class="col-xs-4">
-                    <table class="table-condensed" ng-repeat="flight in route.flights">
-                        <tr class="row">
-                            <td style="border-top:none">{{ flight.departure }}</td>
-                        </tr>
-                        <tr class="row">
-                            <td style="border-top:none">{{ flight.arrival }}</td>
-                        </tr>
-                    </table>
+                    {{ route.company }}
                 </td>
-                <td class="col-xs-6">
-                    <table class="table-condensed" ng-repeat="flight in route.flights">
-                        <tr class="row">
-                            <td style="border-top:none">{{ flight.number }} - {{ flight.company }}</td>
-                        </tr>
-                        <tr class="row">
-                            <td style="border-top:none">{{ flight.starting }} - {{ flight.destination }}</td>
-                        </tr>
-                    </table>
+                <td class="col-xs-2">
+                   {{ route.turn }}
                 </td>
-                <td class="col-xs-1">
-                    <table class="table-condensed">
-                        <tr class="row">
-                            <td style="border-top:none;font:26px;font-weight:bold;">{{ route.price }}</td>
-                        </tr>
-                        <tr class="row">
-                            <td style="border-top:none">+{{ route.tax }}</td>
-                        </tr>
-                    </table>
+                <td class="col-xs-5">
+                    ￥{{ route.price }}+{{ route.tax }}
                 </td>
-                <td class="col-xs-1"><input type="checkbox" ng-model="route.selected"/></td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="route.selected" ng-click="$event.stopPropagation()"/></td>
             </tr>
         </table>
+
     </div>
-    <div class="products-wrapper container">
-        <h3>酒店</h3>
+    <div class="products-wrapper container" ng-show="routes && commodities">
+        <h4>优惠促销</h4>
         <table class="table table-hover">
-            <tr class="row">
-                <td class="col-xs-5">酒店名</td>
-                <td class="col-xs-3">类型</td>
-                <td class="col-xs-3">价格</td>
+            <tr class="row success">
+                <td class="col-xs-5"><strong>产品名</strong></td>
+                <td class="col-xs-3"><strong>类型</strong></td>
+                <td class="col-xs-3"><strong>价格</strong></td>
                 <td class="col-xs-1"></td>
             </tr>
-            <tr class="row" ng-class="{true:'success', false:''}[hotel.selected]" ng-repeat="hotel in hotels">
-                <td class="col-xs-5">{{ hotel.name }}</td>
-                <td class="col-xs-3">{{ hotel.inventory_type }}</td>
-                <td class="col-xs-3">{{ hotel.price }}</td>
-                <td class="col-xs-1"><input type="checkbox" ng-model="hotel.selected"/></td>
-            </tr>
-        </table>
-    </div>
-    <div class="products-wrapper container">
-        <h3>目的地产品</h3>
-        <table class="table table-hover">
-            <tr class="row">
-                <td class="col-xs-5">产品名</td>
-                <td class="col-xs-3">类型</td>
-                <td class="col-xs-3">价格</td>
-                <td class="col-xs-1"></td>
-            </tr>
-            <tr class="row" ng-class="{true:'success', false:''}[commodity.selected]" ng-repeat="commodity in commodities">
+            <tr class="row" ng-class="{true:'success', false:''}[commodity.selected]" ng-click="openHtml(commodity)" ng-repeat="commodity in commodities">
                 <td class="col-xs-5">{{ commodity.name }}</td>
                 <td class="col-xs-3">{{ commodity.inventory_type }}</td>
                 <td class="col-xs-3">{{ commodity.price }}</td>
-                <td class="col-xs-1"><input type="checkbox" ng-model="commodity.selected"/></td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="commodity.selected" ng-click="$event.stopPropagation()" /></td>
             </tr>
         </table>
     </div>
-    <div><a class="fixed-footer" id="submit-products" href="{{getUrl()}}"><span>提交</span></a></div>
+    <div class="products-wrapper container" ng-show="routes && hotels">
+        <h4>特价酒店</h4>
+        <table class="table table-hover">
+            <tr class="row success">
+                <td class="col-xs-5"><strong>酒店名</strong></td>
+                <td class="col-xs-3"><strong>类型</strong></td>
+                <td class="col-xs-3"><strong>价格</strong></td>
+                <td class="col-xs-1"></td>
+            </tr>
+            <tr class="row" ng-class="{true:'success', false:''}[hotel.selected]" ng-click="openHtml(hotel)" ng-repeat="hotel in hotels">
+                <td class="col-xs-5">{{ hotel.name }}</td>
+                <td class="col-xs-3">{{ hotel.inventory_type }}</td>
+                <td class="col-xs-3">{{ hotel.price }}</td>
+                <td class="col-xs-1"><input type="checkbox" ng-model="hotel.selected" ng-click="$event.stopPropagation()" /></td>
+            </tr>
+        </table>
+    </div>
+    <div>
+             <div class="col-xs-12" style="margin-top: 10px;" ng-show="loadded">
+                <button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="submit()">预定</button>
+            </div>
+    </div>
+
+
 </div>
+</script>
+
+<script type="text/ng-template" id="validate.html">
+
+<form class="form-horizontal" role="form" ng-controller="ValidateController" id="validate-controller" ng-submit="submit()">
+
+    <div class="form-group">
+        <label for="contact" class="col-xs-3 control-label"><span>联系人</span>
+        </label>
+        <div class="col-xs-9">
+            <input type="text" class="form-control" id="contact" ng-model="contact" name="contact" placeholder="{{ contact }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="phone" class="col-xs-3 control-label"><span>手机号</span>
+        </label>
+        <div class="col-xs-9">
+            <input type="phone" class="form-control" id="phone" ng-model="phone" name="phone" placeholder="{{ phone }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="email" class="col-xs-3 control-label"><span>邮箱</span>
+        </label>
+        <div class="col-xs-9">
+            <input type="email" class="form-control" id="email" ng-model="email" name="email" placeholder="{{ email }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="user_count" class="col-xs-3 control-label"><span>旅客人数</span>
+        </label>
+        <div class="col-xs-9">
+            <input type="number" class="form-control" id="user_count" ng-model="user_count" ng-change="countChange()" name="user_count" placeholder="{{ user_count }}">
+        </div>
+    </div>
+    <hr/>
+    <div class="form_root" ng-model="users[$index]" ng-repeat="user in users track by $index">
+        <div class="form-group">
+            <label for="firstname" class="col-xs-3 control-label"><span>姓</span>
+            </label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control" id="firstname" name="firstname" ng-model="users[$index].firstname" placeholder="姓">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="secondname" class="col-xs-3 control-label"><span>名</span>
+            </label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control" id="secondname" name="secondname" ng-model="users[$index].secondname" placeholder="名">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="gender" class="col-xs-3 control-label"><span>性别</span>
+            </label>
+            <div class="col-xs-9">
+                <select class="form-control" name="gender" id="gender" ng-model="user.gender">
+                    <option value="m">男</option>
+                    <option value="f">女</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="country" class="col-xs-3 control-label"><span>国籍</span>
+            </label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control" id="country" name="country" ng-model="users[$index].country" placeholder="中国">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="identify" class="col-xs-3 control-label"><span>证件号</span>
+            </label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control" id="identify" name="identify" ng-model="users[$index].identify" placeholder="">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="birthday" class="col-xs-3 control-label"><span>出生日期</span>
+            </label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control" datepicker-popup="{{format}}"
+                        ng-required="true" class="form-control"
+                        show_weeks="false" day-title-format="yyyy-MM"
+                        current-text="今天" toggle-weeks-text="周" clear-text="清空" close-text="完成
+                        id="birthday" name="birthday" ng-model="users[$index].birthday" placeholder="" ng-if="is_android">
+                <input type="date" class="form-control" id="birthday" name="birthday" ng-model="users[$index].birthday" placeholder="" ng-if="!is_android">
+
+            </div>
+        </div>
+        <hr/>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-12">
+            <button type="submit" class="btn btn-primary btn-lg btn-block">提交</button>
+        </div>
+    </div>
+</form>
+</script>
+
+<script type="text/ng-template" id="success.html">
+    <div class="alert alert-success">
+        您的订单已提交！客服人员将尽快与您联系，谢谢！
+        </br>   如果您有任何问题可拨打热线010-85227835
+    </div>
+</script>
+
+<script type="text/ng-template" id="modal.html">
+        <div class="modal-body">
+        <h4>{{ route.starting }} - {{ route.destination }}</h4>
+        <table ng-model="route">
+            <tr class="row">
+                <td>
+                    <div class="container">
+                        <table class="table" ng-repeat="flight in route.flights|filter:{status:1} ">
+                            <tr class="row">
+                                <td class="col-xs-6">航空公司: {{ flight.company }}</td>
+                                <td class="col-xs-6">航班号: {{ flight.number }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">机型: {{ flight.modal }}</td>
+                                <td class="col-xs-6">飞行时间: {{ flight.duration }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">起飞机场: {{ flight.starting }}</td>
+                                <td class="col-xs-6">抵达机场: {{ flight.destination }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">起飞时间: {{ flight.departure|date:'yyyy-MM-dd HH:mm' }}</td>
+                                <td class="col-xs-6">抵达时间: {{ flight.arrival|date:'yyyy-MM-dd HH:mm' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <h4>{{ route.destination }} - {{ route.starting }}</h4>
+        <table ng-model="route">
+            <tr class="row">
+                <td>
+                    <div class="container">
+                        <table class="table" ng-repeat="flight in route.flights|filter:{status:0} ">
+                            <tr class="row">
+                                <td class="col-xs-6">航空公司: {{ flight.company }}</td>
+                                <td class="col-xs-6">航班号: {{ flight.number }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">机型: {{ flight.modal }}</td>
+                                <td class="col-xs-6">飞行时间: {{ flight.duration }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">起飞机场: {{ flight.starting }}</td>
+                                <td class="col-xs-6">抵达机场: {{ flight.destination }}</td>
+                            </tr>
+                            <tr class="row">
+                                <td class="col-xs-6">起飞时间: {{ flight.departure|date:'yyyy-MM-dd HH:mm' }}</td>
+                                <td class="col-xs-6">抵达时间: {{ flight.arrival|date:'yyyy-MM-dd HH:mm' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">关闭</button>
+        </div>
+</script>
+
+<script type="text/ng-template" id="detail.html">
+        <div class="modal-header" ng-modal="item">
+            <h4>{{ item.name }}</h4>
+        </div>
+        <div class="modal-body">
+            <div ng-bind-html="item.html">
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">关闭</button>
+        </div>
+</script>
+
 </body>
 </html>
 {% endverbatim %}

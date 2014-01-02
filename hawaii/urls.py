@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^plane/', include('hawaii.apps.plane.urls')),
     url(r'^weixin/', include('hawaii.apps.weixin.urls')),
+    url(r'^hotels/', include('hawaii.apps.hotel.urls')),
 )
 
 if settings.DEBUG:
