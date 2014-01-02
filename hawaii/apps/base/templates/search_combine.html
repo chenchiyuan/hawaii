@@ -27,13 +27,14 @@
     }
 
     function ValidateController($scope, $http, $location){
+        $scope.format = 'yyyy-MM-dd';
         $scope.user_count = 1;
         var default_user = {
             "firstname": "姓(英文)",
             "secondname": "名(英文)",
             "gender": "m",
             "country": "中国",
-            "birthday": "1980-01-01"
+            "birthday": "1981-01-01"
         };
         $scope.users = [];
         $scope.users.push(angular.copy(default_user));
@@ -462,7 +463,11 @@
             <label for="birthday" class="col-xs-3 control-label"><span>出生日期</span>
             </label>
             <div class="col-xs-9">
-                <input type="date" class="form-control" id="birthday" name="birthday" ng-model="users[$index].birthday" placeholder="">
+                <input type="text" class="form-control" datepicker-popup="{{format}}"
+                        ng-required="true" class="form-control"
+                        show_weeks="false" day-title-format="yyyy-MM"
+                        current-text="今天" toggle-weeks-text="周" clear-text="清空" close-text="完成
+                        id="birthday" name="birthday" ng-model="users[$index].birthday" placeholder="">
             </div>
         </div>
         <hr/>
