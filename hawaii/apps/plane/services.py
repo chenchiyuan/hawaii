@@ -897,7 +897,7 @@ u'HX': u'香港航空',
 
 
 class Route(object):
-    def __init__(self, company, starting, destination, price, tax, turn=0, flights=[]):
+    def __init__(self, company, starting, destination, price, tax, limit_no, turn=0, flights=[]):
         self.company = company
         self.starting = starting
         self.destination = destination
@@ -907,6 +907,8 @@ class Route(object):
         self.tax = tax
         self.flights = flights
         self.turn = turn
+        self.limit_no = limit_no
+        self.limits = []
 
     @classmethod
     def search(cls, starting, destination, departure, back_time="", seat_type="Y", **kwargs):
@@ -939,7 +941,8 @@ class Route(object):
             "arrival": self.arrival,
             "price": self.price,
             "tax": self.tax,
-            "flights": map(lambda flight: flight.to_json(), self.flights)
+            "flights": map(lambda flight: flight.to_json(), self.flights),
+            "limit_no": self.limit_no
         }
 
     @classmethod
@@ -954,6 +957,7 @@ class Route(object):
             route_starting = City.get_name(route.find("f").text)
             route_destination = City.get_name(route.find("t").text)
             route_company = Company.get_name(route.find("a").text)
+            route_limit = route.find("l").text
 
             route_turn_tag = route.find("zz")
             if not route_turn_tag:
@@ -976,7 +980,7 @@ class Route(object):
                     arrival_date = arrival_date.text
 
                 arrival_time = route_segment.find("tt").text
-                seat_type = route_segment.find("st")
+                seat_type = route_segment.find("st").text
                 flight_price = route_segment.find("m")
                 duration = route_segment.find("d").text
                 modal = route_segment.find("et").text
@@ -991,20 +995,38 @@ class Route(object):
                     "arrival": "%s %s:%s" % (arrival_date, arrival_time[:2], arrival_time[2:]),
                     "duration": duration,
                     "modal": modal,
-                    "status": status
+                    "status": status,
+                    "seat_type": seat_type
                 }
                 flight = Flight(**flight_data)
                 flights.append(flight)
             route = Route(route_company, route_starting,
                           route_destination, price=price,
-                          tax=tax, flights=flights, turn=route_turn)
+                          tax=tax, flights=flights, turn=route_turn, limit_no=route_limit)
             result_routes.append(route)
 
         return result_routes
 
+    @classmethod
+    def get_limits(cls, limit_no):
+        url = "http://intf.fare2go.com/limit.php?p=%s" % limit_no
+        try:
+            content = requests.get(url).content
+            soup = BeautifulSoup(content, from_encoding="utf-8")
+            limits = soup.find_all("limit")
+            final_limits = []
+            for limit in limits:
+                limit_type = limit.find('type').text
+                content = limit.find('content').text
+                final_limits.append({"limit_type": limit_type, "content": content})
+            return final_limits
+        except:
+            return []
+
 
 class Flight(object):
-    def __init__(self, number, staring, destination, company, departure, arrival, duration, modal, status=1, amount=1, **kwargs):
+    def __init__(self, number, staring, destination, company, departure, arrival, duration, modal, seat_type="Y",
+                 status=1, amount=1, **kwargs):
         self.number = number
         self.starting = staring
         self.destination = destination
@@ -1015,6 +1037,7 @@ class Flight(object):
         self.amount = amount
         self.modal = modal
         self.status = status
+        self.seat_type = seat_type
 
     def to_json(self):
         return {
@@ -1027,9 +1050,22 @@ class Flight(object):
             "amount": self.amount,
             "duration": self.duration,
             "modal": self.modal,
-            "status": self.status
+            "status": self.status,
+            "seat_type": self.seat_type
         }
 
+    @classmethod
+    def format_datetime(cls, string):
+        return datetime.datetime.strptime(string, "%Y-%m-%dT%H:%M:%S")
+
+    @classmethod
+    def get_type(cls, seat_type):
+        mapping = {
+            "Y": u"经济舱",
+            "C": u"商务舱",
+            "F": u"头等舱"
+        }
+        return mapping.get(seat_type, u"经济舱")
 
 def test():
     return Route.search(starting="PEK", destination="FRA", departure="2013-12-29")

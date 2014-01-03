@@ -27,41 +27,19 @@
     }
 
     function ValidateController($scope, $http, $location){
-        $scope.format = 'yyyy-MM-dd';
-        var isMobile = {
-            Android: function() {
-                return navigator.userAgent.match(/Android/i);
-            },
-            BlackBerry: function() {
-                return navigator.userAgent.match(/BlackBerry/i);
-            },
-            iOS: function() {
-                return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-            },
-            Opera: function() {
-                return navigator.userAgent.match(/Opera Mini/i);
-            },
-            Windows: function() {
-                return navigator.userAgent.match(/IEMobile/i);
-            },
-            any: function() {
-                return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
-            }
-        };
-        $scope.is_android = isMobile.Android();
-
-        $scope.user_count = 1;
         var default_user = {
             "firstname": "姓(英文)",
             "secondname": "名(英文)",
             "gender": "m",
             "country": "中国",
-            "birthday": "1981-01-01"
+            "birthday": "1981-01-01",
+            "user_type": "adult"
         };
         $scope.users = [];
         $scope.users.push(angular.copy(default_user));
         $scope.phone = "";
         $scope.contact = "";
+        $scope.user_count = 1;
         $scope.email = "";
 
         $scope.countChange = function(){
@@ -80,10 +58,12 @@
 
         $scope.submit = function(){
             var data = {
-                "contact": $scope.contact,
-                "email": $scope.email,
-                "user_count": $scope.user_count,
-                "phone": $scope.phone,
+                "meta": {
+                    "contact": $scope.contact,
+                    "email": $scope.email,
+                    "phone": $scope.phone,
+                    "user_count": $scope.user_count
+                },
                 "users": $scope.users,
                 "products": window.products
             };
@@ -416,21 +396,21 @@
         <label for="contact" class="col-xs-3 control-label"><span>联系人</span>
         </label>
         <div class="col-xs-9">
-            <input type="text" class="form-control" id="contact" ng-model="contact" name="contact" placeholder="{{ contact }}">
+            <input type="text" class="form-control" id="contact" ng-model="contact" ng-required="true" name="contact" placeholder="{{ contact }}">
         </div>
     </div>
     <div class="form-group">
         <label for="phone" class="col-xs-3 control-label"><span>手机号</span>
         </label>
         <div class="col-xs-9">
-            <input type="phone" class="form-control" id="phone" ng-model="phone" name="phone" placeholder="{{ phone }}">
+            <input type="phone" class="form-control" id="phone" ng-model="phone" ng-required="true" name="phone" placeholder="{{ phone }}">
         </div>
     </div>
     <div class="form-group">
         <label for="email" class="col-xs-3 control-label"><span>邮箱</span>
         </label>
         <div class="col-xs-9">
-            <input type="email" class="form-control" id="email" ng-model="email" name="email" placeholder="{{ email }}">
+            <input type="email" class="form-control" id="email" ng-model="email" ng-required="true" name="email" placeholder="{{ email }}">
         </div>
     </div>
     <div class="form-group">
@@ -446,52 +426,24 @@
             <label for="firstname" class="col-xs-3 control-label"><span>姓</span>
             </label>
             <div class="col-xs-9">
-                <input type="text" class="form-control" id="firstname" name="firstname" ng-model="users[$index].firstname" placeholder="姓">
+                <input type="text" class="form-control" id="firstname" name="firstname" ng-model="users[$index].firstname" ng-required="true" placeholder="姓">
             </div>
         </div>
         <div class="form-group">
             <label for="secondname" class="col-xs-3 control-label"><span>名</span>
             </label>
             <div class="col-xs-9">
-                <input type="text" class="form-control" id="secondname" name="secondname" ng-model="users[$index].secondname" placeholder="名">
+                <input type="text" class="form-control" id="secondname" name="secondname" ng-model="users[$index].secondname" ng-required="true" placeholder="名">
             </div>
         </div>
         <div class="form-group">
-            <label for="gender" class="col-xs-3 control-label"><span>性别</span>
+            <label for="user_type" class="col-xs-3 control-label"><span>类型</span>
             </label>
             <div class="col-xs-9">
-                <select class="form-control" name="gender" id="gender" ng-model="user.gender">
-                    <option value="m">男</option>
-                    <option value="f">女</option>
+                <select class="form-control" name="gender" id="user_type" ng-model="user.user_type" quired="true"ng-re>
+                    <option value="adult">成人</option>
+                    <option value="child">儿童</option>
                 </select>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="country" class="col-xs-3 control-label"><span>国籍</span>
-            </label>
-            <div class="col-xs-9">
-                <input type="text" class="form-control" id="country" name="country" ng-model="users[$index].country" placeholder="中国">
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="identify" class="col-xs-3 control-label"><span>证件号</span>
-            </label>
-            <div class="col-xs-9">
-                <input type="text" class="form-control" id="identify" name="identify" ng-model="users[$index].identify" placeholder="">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="birthday" class="col-xs-3 control-label"><span>出生日期</span>
-            </label>
-            <div class="col-xs-9">
-                <input type="text" class="form-control" datepicker-popup="{{format}}"
-                        ng-required="true" class="form-control"
-                        show_weeks="false" day-title-format="yyyy-MM"
-                        current-text="今天" toggle-weeks-text="周" clear-text="清空" close-text="完成
-                        id="birthday" name="birthday" ng-model="users[$index].birthday" placeholder="" ng-if="is_android">
-                <input type="date" class="form-control" id="birthday" name="birthday" ng-model="users[$index].birthday" placeholder="" ng-if="!is_android">
-
             </div>
         </div>
         <hr/>
