@@ -28,8 +28,8 @@
 
     function ValidateController($scope, $http, $location){
         var default_user = {
-            "firstname": "姓(英文)",
-            "secondname": "名(英文)",
+            "firstname": "",
+            "secondname": "",
             "gender": "m",
             "country": "中国",
             "birthday": "1981-01-01",
@@ -426,14 +426,14 @@
             <label for="firstname" class="col-xs-3 control-label"><span>姓</span>
             </label>
             <div class="col-xs-9">
-                <input type="text" class="form-control" id="firstname" name="firstname" ng-model="users[$index].firstname" ng-required="true" placeholder="姓">
+                <input type="text" class="form-control" id="firstname" name="firstname" ng-model="users[$index].firstname" ng-required="true" placeholder="姓（英文）">
             </div>
         </div>
         <div class="form-group">
             <label for="secondname" class="col-xs-3 control-label"><span>名</span>
             </label>
             <div class="col-xs-9">
-                <input type="text" class="form-control" id="secondname" name="secondname" ng-model="users[$index].secondname" ng-required="true" placeholder="名">
+                <input type="text" class="form-control" id="secondname" name="secondname" ng-model="users[$index].secondname" ng-required="true" placeholder="名（英文）">
             </div>
         </div>
         <div class="form-group">
