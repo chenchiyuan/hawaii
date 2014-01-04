@@ -111,6 +111,9 @@ class SearchQueryView(View):
                 return 1
         routes = sorted(routes, cmp=cmp)
 
+        routes_available = ['HA', 'KE']
+        routes = filter(lambda route: route['company_three'] in routes_available, routes)
+
         return json_response({
             "hotels": hotels[:page_size],
             "commodities": commodities[:page_size],

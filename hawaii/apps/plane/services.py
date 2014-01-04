@@ -897,8 +897,9 @@ u'HX': u'香港航空',
 
 
 class Route(object):
-    def __init__(self, company, starting, destination, price, tax, limit_no, turn=0, flights=[]):
-        self.company = company
+    def __init__(self, company_three, starting, destination, price, tax, limit_no, turn=0, flights=[]):
+        self.company_three = company_three
+        self.company = Company.get_name(company_three)
         self.starting = starting
         self.destination = destination
         self.departure = flights[0].departure
@@ -934,6 +935,7 @@ class Route(object):
             turn = unicode(turn)
         return {
             "company": self.company,
+            "company_three": self.company_three,
             "turn": turn,
             "starting": self.starting,
             "destination": self.destination,
@@ -956,7 +958,7 @@ class Route(object):
             tax = route.find("x").text
             route_starting = City.get_name(route.find("f").text)
             route_destination = City.get_name(route.find("t").text)
-            route_company = Company.get_name(route.find("a").text)
+            route_company_three = route.find("a").text
             route_limit = route.find("l").text
 
             route_turn_tag = route.find("zz")
@@ -970,7 +972,7 @@ class Route(object):
                 number = route_segment.find("no")
                 from_city = City.get_name(route_segment.find("f").text)
                 to_city = City.get_name(route_segment.find("t").text)
-                company = Company.get_name(route_segment.find("a").text)
+                company = route_segment.find("a").text
                 departure_date = route_segment.find("fd").text
                 departure_time = route_segment.find("ft").text
                 arrival_date = route_segment.find("td")
@@ -1000,7 +1002,7 @@ class Route(object):
                 }
                 flight = Flight(**flight_data)
                 flights.append(flight)
-            route = Route(route_company, route_starting,
+            route = Route(route_company_three, route_starting,
                           route_destination, price=price,
                           tax=tax, flights=flights, turn=route_turn, limit_no=route_limit)
             result_routes.append(route)
