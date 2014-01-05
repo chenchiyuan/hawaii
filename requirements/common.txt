@@ -27,6 +27,7 @@ upyun
 beautifulsoup4
 bleach
 Pillow
+xmltodict
 
 # github
 git+git://github.com/chenchiyuan/DjangoUeditor.git

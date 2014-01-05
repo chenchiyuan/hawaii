@@ -37,36 +37,28 @@ class ConfirmProductsView(View):
         for user in kwargs.get("users", []):
             user['user_type'] = user_type_mapping.get(user.get('user_type', ""), u"成人")
 
-        for route in kwargs['products'].get("routes", []):
+        routes = kwargs['products'].get("routes", [])
+        for route in routes:
             route['limits'] = Route.get_limits(route['limit_no'])
             for flight in route.get("flights", []):
                 flight['seat_type'] = Flight.get_type(seat_type=flight.get("seat_type", ""))
                 flight['departure'] = Flight.format_datetime(flight['departure'])
                 flight['arrival'] = Flight.format_datetime(flight['arrival'])
 
+        pnr = self.get_pnr(routes)
         const_data = self.get_const()
         kwargs.update(const_data)
-        limits = self.get_limits(**kwargs)
-        kwargs.update(limits)
+        kwargs['pnr'] = pnr
         return render_to_string("email.html", kwargs)
 
-    def get_limits(self, **kwargs):
-        return {"limits": [
-            {
-                "limit_type": u"文件规定",
-                "content": u"NO-SHOW:CNY2000",
-            },
-            {
-                "limit_type": u"出票时限",
-                "content": u"有效期 3天-12个月行李 20KG"
-            }
-        ]}
+    def get_pnr(self, routes):
+        print(routes)
+        return "PNR123"
 
     def get_const(self):
         return {
             "company_logo": "http://www.hawaiianairlines.com.cn/app_themes/hawaiianair.cn_dev/img/header/logo.png",
             "company_phone": "010-85227835",
-            "pnr": "PNR124",
             "datetime": now(),
         }
 
@@ -112,7 +104,7 @@ class SearchQueryView(View):
         routes = sorted(routes, cmp=cmp)
 
         routes_available = ['HA', 'KE']
-        routes = filter(lambda route: route['company_three'] in routes_available, routes)
+        #routes = filter(lambda route: route['company_three'] in routes_available, routes)
 
         return json_response({
             "hotels": hotels[:page_size],

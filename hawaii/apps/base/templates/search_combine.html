@@ -79,6 +79,12 @@
         $scope.routes = null;
         $scope.hotels = null;
         $scope.commodities = null;
+        $scope.routes_selected = 0;
+
+        $scope.selectRoute = function($event, $index){
+            $scope.routes_selected = $index;
+            $event.stopPropagation();
+        };
 
         var querystring = location.href.substring(location.href.indexOf("?")+1);
         var request = $http({
@@ -119,17 +125,11 @@
 
         $scope.submit = function(){
             var hotels = [];
-            var routes = [];
             var commodities = [];
             angular.forEach($scope.hotels, function(hotel){
                 if(hotel.selected){
                     hotel.html = "";
                     hotels.push(hotel);
-                }
-            });
-            angular.forEach($scope.routes, function(route){
-                if(route.selected){
-                    routes.push(route);
                 }
             });
             angular.forEach($scope.commodities, function(commodity){
@@ -141,7 +141,7 @@
 
             var products = {
                 "hotels": hotels,
-                "routes": routes,
+                "routes": [$scope.routes[$scope.routes_selected],], //只选择一个
                 "commodities": commodities
             };
             window.products = products;
@@ -163,7 +163,6 @@
     };
 
     function ModalDetailController($scope, $modalInstance, item, $sce) {
-        console.log(item);
         $scope.item = item;
 
         $scope.ok = function () {
@@ -329,7 +328,7 @@
                 <td class="col-xs-1"></td>
             </tr>
 
-            <tr class="row" ng-class="{true:'success', false:''}[route.selected]" ng-click="openRoute(route)" ng-repeat="route in routes">
+            <tr class="row" ng-class="{true:'success', false:''}[routes[$index].selected]" ng-click="openRoute(route)" ng-repeat="route in routes">
                 <td class="col-xs-4">
                     {{ route.company }}
                 </td>
@@ -339,7 +338,7 @@
                 <td class="col-xs-5">
                     ￥{{ route.price }}+{{ route.tax }}
                 </td>
-                <td class="col-xs-1"><input type="checkbox" ng-model="route.selected" ng-click="$event.stopPropagation()"/></td>
+                <td class="col-xs-1"><input type="radio" ng-checked="$index == routes_selected" ng-click="selectRoute($event, $index)"/></td>
             </tr>
         </table>
 
@@ -426,14 +425,14 @@
             <label for="firstname" class="col-xs-3 control-label"><span>姓</span>
             </label>
             <div class="col-xs-9">
-                <input type="text" class="form-control" id="firstname" name="firstname" ng-model="users[$index].firstname" ng-required="true" placeholder="姓（英文）">
+                <input type="text" class="form-control" id="firstname" name="firstname" ng-model="users[$index].firstname" ng-required="true" placeholder="姓（必须为英文，否则无法预定）">
             </div>
         </div>
         <div class="form-group">
             <label for="secondname" class="col-xs-3 control-label"><span>名</span>
             </label>
             <div class="col-xs-9">
-                <input type="text" class="form-control" id="secondname" name="secondname" ng-model="users[$index].secondname" ng-required="true" placeholder="名（英文）">
+                <input type="text" class="form-control" id="secondname" name="secondname" ng-model="users[$index].secondname" ng-required="true" placeholder="名（必须为英文，否则无法预定）">
             </div>
         </div>
         <div class="form-group">

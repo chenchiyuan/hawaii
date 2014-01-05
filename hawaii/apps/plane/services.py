@@ -3,9 +3,9 @@
 
 from __future__ import division, unicode_literals, print_function
 from bs4 import BeautifulSoup
-import time
 import datetime
 import requests
+import xmltodict
 
 
 class City(object):
@@ -897,7 +897,7 @@ u'HX': u'香港航空',
 
 
 class Route(object):
-    def __init__(self, company_three, starting, destination, price, tax, limit_no, turn=0, flights=[]):
+    def __init__(self, company_three, starting, destination, price, tax, limit_no, data, turn=0, flights=[]):
         self.company_three = company_three
         self.company = Company.get_name(company_three)
         self.starting = starting
@@ -910,6 +910,7 @@ class Route(object):
         self.turn = turn
         self.limit_no = limit_no
         self.limits = []
+        self.data = data
 
     @classmethod
     def search(cls, starting, destination, departure, back_time="", seat_type="Y", **kwargs):
@@ -944,15 +945,18 @@ class Route(object):
             "price": self.price,
             "tax": self.tax,
             "flights": map(lambda flight: flight.to_json(), self.flights),
-            "limit_no": self.limit_no
+            "limit_no": self.limit_no,
+            "data": self.data
         }
 
     @classmethod
     def parse_xml(cls, content):
         soup = BeautifulSoup(content)
+        datas = xmltodict.parse(content)
+
         routes = soup.find_all("r")
         result_routes = []
-        for route in routes:
+        for index, route in enumerate(routes):
             route_segments = route.find_all("s")
             price = route.find("pm").text
             tax = route.find("x").text
@@ -960,6 +964,7 @@ class Route(object):
             route_destination = City.get_name(route.find("t").text)
             route_company_three = route.find("a").text
             route_limit = route.find("l").text
+
 
             route_turn_tag = route.find("zz")
             if not route_turn_tag:
@@ -1002,8 +1007,9 @@ class Route(object):
                 }
                 flight = Flight(**flight_data)
                 flights.append(flight)
+
             route = Route(route_company_three, route_starting,
-                          route_destination, price=price,
+                          route_destination, price=price, data=datas['RS']['R'][index],
                           tax=tax, flights=flights, turn=route_turn, limit_no=route_limit)
             result_routes.append(route)
 
@@ -1069,5 +1075,8 @@ class Flight(object):
         }
         return mapping.get(seat_type, u"经济舱")
 
-def test():
-    return Route.search(starting="PEK", destination="FRA", departure="2013-12-29")
+
+class PNR(object):
+    @classmethod
+    def gen_by_routes(cls, routes):
+        pass
