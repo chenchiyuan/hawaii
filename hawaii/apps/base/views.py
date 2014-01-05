@@ -50,7 +50,6 @@ class ConfirmProductsView(View):
                 route['deadline'] = datetime_delta(now_time, hours=const.DEADLINE_LESS)
 
             for flight in route.get("flights", []):
-                flight['seat_type'] = Flight.get_type(seat_type=flight.get("seat_type", ""))
                 flight['departure'] = Flight.format_datetime(flight['departure'])
                 flight['arrival'] = Flight.format_datetime(flight['arrival'])
 
