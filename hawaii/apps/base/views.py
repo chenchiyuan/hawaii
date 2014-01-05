@@ -25,14 +25,9 @@ class ConfirmProductsView(View):
 
     def post(self, requests, *args, **kwargs):
         products_json_data = json.loads(requests.body)
-        html = self.get_html(**products_json_data)
-        if not settings.DEBUG:
-            send_email(settings.EMAIL_TO, subject=const.get_email_title(), html=html)
-        else:
-            import os
-            file = open(os.path.join(settings.PROJECT_HOME, "data", "email.html"), "w")
-            file.write(html.encode('utf-8'))
-            file.close()
+        html, json_data = self.get_html(**products_json_data)
+        bcc = products_json_data['meta'].get("email", "")
+        send_email(settings.EMAIL_TO, subject=const.get_email_title(**json_data), html=html, bcc=bcc)
         return json_response({"status": 200})
 
     def get_html(self, **kwargs):
@@ -64,7 +59,7 @@ class ConfirmProductsView(View):
         const_data = self.get_const()
         kwargs.update(const_data)
         kwargs['pnr'] = pnr
-        return render_to_string("email.html", kwargs)
+        return render_to_string("email.html", kwargs), kwargs
 
     def get_pnr(self, routes, passengers):
         return PNR.gen_by_route(routes[0], passengers=passengers)

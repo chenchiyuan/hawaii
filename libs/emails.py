@@ -5,12 +5,12 @@ from __future__ import division, unicode_literals, print_function
 import requests
 
 
-def send_email(to_email, subject="", html="", from_email="zoneke.ccy@gmail.com"):
-    #send_email_by_sendcloud(to_email, subject, html, from_email)
-    return send_email_by_mailgun(to_email, subject, html, from_email)
+def send_email(to_email, subject="", html="", from_email="zoneke.ccy@gmail.com", **kwargs):
+    #send_email_by_sendcloud(to_email, subject, html, from_email, **kwargs)
+    return send_email_by_mailgun(to_email, subject, html, from_email, **kwargs)
 
 
-def send_email_by_sendcloud(to_email, subject="", html="", from_email="zoneke.ccy@gmail.com"):
+def send_email_by_sendcloud(to_email, subject="", html="", from_email="zoneke.ccy@gmail.com", **kwargs):
     url = "https://sendcloud.sohu.com/webapi/mail.send.xml"
     params = {
         "api_user": "postmaster@zoneke.sendcloud.org",
@@ -18,19 +18,22 @@ def send_email_by_sendcloud(to_email, subject="", html="", from_email="zoneke.cc
         "from": from_email,
         "to": to_email,
         "subject": subject,
-        "html": html
+        "html": html,
     }
+    params.update(kwargs)
     return requests.post(url, data=params)
 
 
-def send_email_by_mailgun(to_email, subject, html, from_email="zoneke.ccy@gmail.com"):
+def send_email_by_mailgun(to_email, subject, html, from_email="zoneke.ccy@gmail.com", **kwargs):
+    data = {"from": from_email,
+              "to": to_email.split(";"),
+              "subject": subject,
+              "html": html}
+    data.update(kwargs)
     return requests.post(
         "https://api.mailgun.net/v2/zoneke.com/messages",
         auth=("api", "key-1t13ykjl8haxzxlxo99q4aoraj3u8hk2"),
-        data={"from": from_email,
-              "to": to_email.split(";"),
-              "subject": subject,
-              "html": html})
+        data=data)
 
 
 def test():
