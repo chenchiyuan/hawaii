@@ -3,8 +3,10 @@
 
 from __future__ import division, unicode_literals, print_function
 from bs4 import BeautifulSoup
-import datetime
+from django.template.loader import render_to_string
+from django.conf import settings
 import requests
+import datetime
 import xmltodict
 
 
@@ -1078,5 +1080,13 @@ class Flight(object):
 
 class PNR(object):
     @classmethod
-    def gen_by_routes(cls, routes):
-        pass
+    def gen_by_route(cls, route, passengers=[]):
+        pnr_url = "http://221.122.114.153/UniFare/Fare2goHttpService.dll/TestMakePNR"
+        xml = render_to_string("pnr.html", {
+            "route": route,
+            "passengers": passengers
+        })
+        r = requests.post(pnr_url, data=xml)
+        data = r.content
+        json_data = xmltodict.parse(data)
+        return json_data[u'PNRStatus']['PNR']

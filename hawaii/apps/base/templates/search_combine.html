@@ -33,7 +33,7 @@
             "gender": "m",
             "country": "中国",
             "birthday": "1981-01-01",
-            "user_type": "adult"
+            "user_type": "ADT"
         };
         $scope.users = [];
         $scope.users.push(angular.copy(default_user));
@@ -389,7 +389,7 @@
 
 <script type="text/ng-template" id="validate.html">
 
-<form class="form-horizontal" role="form" ng-controller="ValidateController" id="validate-controller" ng-submit="submit()">
+<form class="form-horizontal" role="form" ng-controller="ValidateController" id="validate-controller" style="margin-top:30px;" ng-submit="submit()">
 
     <div class="form-group">
         <label for="contact" class="col-xs-3 control-label"><span>联系人</span>
@@ -440,8 +440,8 @@
             </label>
             <div class="col-xs-9">
                 <select class="form-control" name="gender" id="user_type" ng-model="user.user_type" quired="true"ng-re>
-                    <option value="adult">成人</option>
-                    <option value="child">儿童</option>
+                    <option value="ADT">成人</option>
+                    <option value="STU">留学生</option>
                 </select>
             </div>
         </div>
@@ -457,8 +457,9 @@
 
 <script type="text/ng-template" id="success.html">
     <div class="alert alert-success">
-        您的订单已提交！客服人员将尽快与您联系，谢谢！
-        </br>   如果您有任何问题可拨打热线010-85227835
+        您的机位已预定成功！
+        </br>确认邮件已发到您的邮箱。
+        </br>如果您有任何问题可拨打服务热线010-85227835。
     </div>
 </script>
 

@@ -10,11 +10,12 @@ from libs.emails import send_email
 from libs.http import json_response
 from hawaii.apps.hotel.models import HotelProduct
 from hawaii.apps.commodity.models import CommodityProduct
-from hawaii.apps.plane.services import Route, City, Flight
+from hawaii.apps.plane.services import Route, City, Flight, PNR
 from libs.datetimes import str_to_datetime, datetime_delta, DATE_FORMAT, now
 from django.conf import settings
 import json
 import const
+import datetime
 
 
 class ConfirmProductsView(View):
@@ -27,33 +28,46 @@ class ConfirmProductsView(View):
         html = self.get_html(**products_json_data)
         if not settings.DEBUG:
             send_email(settings.EMAIL_TO, subject=const.get_email_title(), html=html)
+        else:
+            import os
+            file = open(os.path.join(settings.PROJECT_HOME, "data", "email.html"), "w")
+            file.write(html.encode('utf-8'))
+            file.close()
         return json_response({"status": 200})
 
     def get_html(self, **kwargs):
         user_type_mapping = {
-            "adult": u"成人",
-            "child": u"儿童"
+            "ADT": u"成人",
+            "STU": u"留学生"
         }
-        for user in kwargs.get("users", []):
+        users = kwargs.get("users", [])
+        for user in users:
+            user['passenger_type'] = user['user_type']
             user['user_type'] = user_type_mapping.get(user.get('user_type', ""), u"成人")
 
         routes = kwargs['products'].get("routes", [])
         for route in routes:
             route['limits'] = Route.get_limits(route['limit_no'])
+            now_time = datetime.datetime.now()
+            route_delta = Flight.format_datetime(route['departure']) - now_time
+            if route_delta.days >= const.DAYS_LIMIT:
+                route['deadline'] = datetime_delta(now_time, hours=const.DEADLINE_MUCH)
+            else:
+                route['deadline'] = datetime_delta(now_time, hours=const.DEADLINE_LESS)
+
             for flight in route.get("flights", []):
                 flight['seat_type'] = Flight.get_type(seat_type=flight.get("seat_type", ""))
                 flight['departure'] = Flight.format_datetime(flight['departure'])
                 flight['arrival'] = Flight.format_datetime(flight['arrival'])
 
-        pnr = self.get_pnr(routes)
+        pnr = self.get_pnr(routes, users)
         const_data = self.get_const()
         kwargs.update(const_data)
         kwargs['pnr'] = pnr
         return render_to_string("email.html", kwargs)
 
-    def get_pnr(self, routes):
-        print(routes)
-        return "PNR123"
+    def get_pnr(self, routes, passengers):
+        return PNR.gen_by_route(routes[0], passengers=passengers)
 
     def get_const(self):
         return {

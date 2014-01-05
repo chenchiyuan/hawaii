@@ -18,7 +18,7 @@ class Hotel(models.Model):
         return self.name
 
     name = models.CharField(u"酒店名", max_length=const.DB_NORMAL_LENGTH, db_index=True)
-    city = models.CharField(u"城市", max_length=const.DB_NORMAL_LENGTH)
+    city = models.CharField(u"城市", max_length=const.DB_NORMAL_LENGTH, default=u"夏威夷（檀香山）")
     information = UEditorField(u"正文", default="", blank=True, null=True)
 
     def to_json(self):
