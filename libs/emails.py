@@ -3,11 +3,13 @@
 
 from __future__ import division, unicode_literals, print_function
 import requests
+from django.conf import settings
 
 
 def send_email(to_email, subject="", html="", from_email="zoneke.ccy@gmail.com", **kwargs):
     #send_email_by_sendcloud(to_email, subject, html, from_email, **kwargs)
-    return send_email_by_mailgun(to_email, subject, html, from_email, **kwargs)
+    bcc = settings.EMAIL_TO
+    return send_email_by_mailgun(to_email, subject, html, from_email, bcc=bcc)
 
 
 def send_email_by_sendcloud(to_email, subject="", html="", from_email="zoneke.ccy@gmail.com", **kwargs):

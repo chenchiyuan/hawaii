@@ -12,7 +12,6 @@ from hawaii.apps.hotel.models import HotelProduct
 from hawaii.apps.commodity.models import CommodityProduct
 from hawaii.apps.plane.services import Route, City, Flight, PNR
 from libs.datetimes import str_to_datetime, datetime_delta, DATE_FORMAT, now
-from django.conf import settings
 import json
 import const
 import datetime
@@ -26,8 +25,8 @@ class ConfirmProductsView(View):
     def post(self, requests, *args, **kwargs):
         products_json_data = json.loads(requests.body)
         html, json_data = self.get_html(**products_json_data)
-        bcc = products_json_data['meta'].get("email", "")
-        send_email(settings.EMAIL_TO, subject=const.get_email_title(**json_data), html=html, bcc=bcc)
+        to = products_json_data['meta'].get("email", "")
+        send_email(to, subject=const.get_email_title(**json_data), html=html)
         return json_response({"status": 200})
 
     def get_html(self, **kwargs):
