@@ -91,7 +91,14 @@ class SearchQueryView(View):
         query_dict = self.get_route_query_dict(request, *args, **kwargs)
         city = City.get_name(query_dict.get("destination", ""))
         routes_search = Route.search(**query_dict)
-        departure = str_to_datetime(query_dict.get("departure", ""), DATE_FORMAT)
+        departure_str = query_dict.get("departure", "")
+        if not departure_str:
+            return json_response({
+                "hotels": [],
+                "commodities": [],
+                "routes": [],
+            })
+        departure = str_to_datetime(departure_str, DATE_FORMAT)
         departure_tomorrow = datetime_delta(departure, days=1)
 
         if not city:
