@@ -892,6 +892,7 @@ u'NW': u'美国西北航空',
 u'OS': u'毛利航空',
 u'SU': u'俄罗斯航空',
 u'HX': u'香港航空',
+u"HA": u"夏威夷航空"
 }
     @classmethod
     def get_name(cls, three):
