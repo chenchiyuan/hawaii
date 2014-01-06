@@ -5,12 +5,13 @@ from __future__ import division, unicode_literals, print_function
 from bs4 import BeautifulSoup
 from django.template.loader import render_to_string
 from django.conf import settings
+from hawaii.apps.base.models import City
 import requests
 import datetime
 import xmltodict
 
 
-class City(object):
+class CityOld(object):
     cities = {
 u'CPH': u'哥本哈根',
 u'CKG': u'重庆',
@@ -818,10 +819,6 @@ u'EZE': u'布宜诺斯艾利斯',
 u'KGL': u'基加利',
     }
 
-    @classmethod
-    def get_name(cls, three):
-        return cls.cities.get(three, three)
-
 
 class Company(object):
     companies = {
@@ -963,8 +960,8 @@ class Route(object):
             route_segments = route.find_all("s")
             price = route.find("pm").text
             tax = route.find("x").text
-            route_starting = City.get_name(route.find("f").text)
-            route_destination = City.get_name(route.find("t").text)
+            route_starting = City.get_name_by_code(route.find("f").text)
+            route_destination = City.get_name_by_code(route.find("t").text)
             route_company_three = route.find("a").text
             route_limit = route.find("l").text
 
@@ -978,8 +975,8 @@ class Route(object):
             flights = []
             for route_segment in route_segments:
                 number = route_segment.find("no")
-                from_city = City.get_name(route_segment.find("f").text)
-                to_city = City.get_name(route_segment.find("t").text)
+                from_city = City.get_name_by_code(route_segment.find("f").text)
+                to_city = City.get_name_by_code(route_segment.find("t").text)
                 company = route_segment.find("a").text
                 departure_date = route_segment.find("fd").text
                 departure_time = route_segment.find("ft").text

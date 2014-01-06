@@ -76,30 +76,26 @@
         <div class="form-group">
             <label for="starting" class="col-xs-4 control-label"><span><i class="icon-plane"> 出发城市</i></span></label>
             <div class="col-xs-8">
+    {% endverbatim %}
                 <select class="form-control" name="starting" id="staring">
-                    <option value="BJS">北京</option>
-                    <option value="SHA">上海</option>
-                    <option value="CAN">广州</option>
-                    <option value="SZX">深圳</option>
-                    <option value="TNA">济南</option>
-                    <option value="TSN">天津</option>
-                    <option value="DLC">大连</option>
-                    <option value="SHE">沈阳</option>
-                    <option value="CTU">成都</option>
+                    {% for city in cities_from %}
+                    <option value="{{ city.code }}">{{ city.name }}</option>
+                    {% endfor %}
                 </select>
+    {% verbatim %}
             </div>
         </div>
         <div class="form-group">
             <label for="destination" class="col-xs-4 control-label"><span><i class="icon-fighter-jet"> 到达城市</i></span>
             </label>
             <div class="col-xs-8">
+    {% endverbatim %}
                 <select class="form-control" name="destination" id="destination">
-                    <option value="HNL">夏威夷</option>
-                    <option value="HKG">香港</option>
-                    <option value="BKK">曼谷</option>
-                    <option value="PAR">巴黎</option>
-                    <option value="LAX">洛杉矶</option>
+                    {% for city in cities_to %}
+                    <option value="{{ city.code }}">{{ city.name }}</option>
+                    {% endfor %}
                 </select>
+    {% verbatim %}
             </div>
         </div>
         <div class="form-group">

@@ -56,3 +56,12 @@ class CustomIndexDashboard(Dashboard):
                 'hawaii.apps.commodity.models.CommodityProduct',
             ),
         ))
+
+        self.children.append(modules.ModelList(
+            u"城市管理",
+            column=2,
+            collapsible=True,
+            models=(
+                'hawaii.apps.base.models.City',
+            ),
+        ))

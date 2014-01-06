@@ -10,7 +10,8 @@ from libs.emails import send_email
 from libs.http import json_response
 from hawaii.apps.hotel.models import HotelProduct
 from hawaii.apps.commodity.models import CommodityProduct
-from hawaii.apps.plane.services import Route, City, Flight, PNR
+from hawaii.apps.plane.services import Route, Flight, PNR
+from hawaii.apps.base.models import City
 from libs.datetimes import str_to_datetime, datetime_delta, DATE_FORMAT, now
 from django.conf import settings
 import json
@@ -71,6 +72,7 @@ class ConfirmProductsView(View):
             "datetime": now(),
         }
 
+
 class SearchProductsView(TemplateView):
     template_name = "search_combine.html"
 
@@ -78,13 +80,21 @@ class SearchProductsView(TemplateView):
 class SearchFormView(TemplateView):
     template_name = "search_form.html"
 
+    def get_context_data(self, **kwargs):
+        context = super(SearchFormView, self).get_context_data(**kwargs)
+        cities_from = City.objects.filter(show_from=True)
+        cities_to = City.objects.filter(show_to=True)
+        context['cities_from'] = cities_from
+        context['cities_to'] = cities_to
+        return context
+
 
 class SearchQueryView(View):
     def get(self, request, *args, **kwargs):
         page_size = 5
 
         query_dict = self.get_route_query_dict(request, *args, **kwargs)
-        city = City.get_name(query_dict.get("destination", ""))
+        city = City.get_name_by_code(query_dict.get("destination", ""))
         routes_search = Route.search(**query_dict)
         departure_str = query_dict.get("departure", "")
         if not departure_str:
