@@ -18,11 +18,16 @@
                         when('/', {templateUrl: 'products.html', controller: SearchController}).
                         when('/validate', {templateUrl: 'validate.html', controller: ValidateController}).
                         when('/success', {templateUrl: 'success.html', controller: SuccessController}).
+                        when('/fail', {templateUrl: 'fail.html', controller: FailController}).
                         otherwise({redirectTo: '/'});
             }]);
 </script>
 <script>
     function SuccessController($scope){
+
+    }
+
+    function FailController($scope) {
 
     }
 
@@ -96,6 +101,10 @@
             $scope.routes = response.routes;
             $scope.hotels = response.hotels;
             $scope.commodities = response.commodities;
+            if($scope.routes.length <= 0){
+                $location.path("/fail");
+                return;
+            }
             $scope.loadded = true;
         });
 
@@ -461,6 +470,23 @@
         </br>确认邮件已发到您的邮箱。
         </br>如果您有任何问题可拨打服务热线010-85227835。
     </div>
+</script>
+
+<script type="text/ng-template" id="fail.html">
+    <div class="alert alert-warning">
+        <p>对不起，您搜索的日期没有夏威夷航空航班。</p>
+        <p>以下是夏威夷航空的航班时刻表：</p>
+        </br>
+        <p>北京⇒檀香山HA898 01:05～16:40-1</p>
+        <p>2014年4月18日起，每周三五日有航班</p>
+        </br>
+        <p>檀香山⇒北京HA897 00:01～05:55+1</p>
+        <p>2014年4月16日起，每周一三五有航班</p>
+
+    </div>
+        <div class="col-xs-12">
+              <a class="btn btn-primary btn-block" role="botton" href="/form/">重新搜索</a>
+        </div>
 </script>
 
 <script type="text/ng-template" id="modal.html">
