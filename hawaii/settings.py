@@ -19,6 +19,7 @@ ADMINS = (
 )
 
 EMAIL_TO = config.get("hawaii", "email_to")
+EMAIL_FROM = config.get("hawaii", "email_from")
 
 MANAGERS = ADMINS
 
