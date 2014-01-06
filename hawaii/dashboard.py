@@ -65,3 +65,11 @@ class CustomIndexDashboard(Dashboard):
                 'hawaii.apps.base.models.City',
             ),
         ))
+        self.children.append(modules.ModelList(
+            u"航空公司管理",
+            column=2,
+            collapsible=True,
+            models=(
+                'hawaii.apps.base.models.Company',
+            ),
+        ))

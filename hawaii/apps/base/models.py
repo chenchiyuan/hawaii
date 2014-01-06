@@ -27,3 +27,23 @@ class City(models.Model):
             return city.name
         except cls.DoesNotExist:
             return code
+
+
+class Company(models.Model):
+    class Meta:
+        db_table = u'company'
+        verbose_name = verbose_name_plural = u"航空公司管理"
+
+    def __unicode__(self):
+        return "%s: %s" % (self.name, self.code)
+
+    code = models.CharField(u"航空公司编码", max_length=16, unique=True, help_text=u"航空公司编码，用于航班搜索。")
+    name = models.CharField(u"公司名", max_length=32, help_text="公司的显示名称")
+
+    @classmethod
+    def get_name_by_code(cls, code):
+        try:
+            company = cls.objects.get(code=code)
+            return company.name
+        except cls.DoesNotExist:
+            return code
