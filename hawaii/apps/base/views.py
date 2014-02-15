@@ -17,6 +17,7 @@ from django.conf import settings
 import json
 import const
 import datetime
+from uuid import uuid4
 
 
 class ConfirmProductsView(View):
@@ -63,7 +64,8 @@ class ConfirmProductsView(View):
         return render_to_string("email.html", kwargs), kwargs
 
     def get_pnr(self, routes, passengers):
-        return PNR.gen_by_route(routes[0], passengers=passengers)
+        uuid = uuid4()
+        return uuid.get_hex()[:6] #PNR.gen_by_route(routes[0], passengers=passengers)
 
     def get_const(self):
         return {
@@ -91,7 +93,7 @@ class SearchFormView(TemplateView):
 
 class SearchQueryView(View):
     def get(self, request, *args, **kwargs):
-        page_size = 5
+        page_size = 8
 
         query_dict = self.get_route_query_dict(request, *args, **kwargs)
         city = City.get_name_by_code(query_dict.get("destination", ""))
@@ -128,8 +130,8 @@ class SearchQueryView(View):
             else:
                 return 1
         routes = sorted(routes, cmp=cmp)
-        routes_available = ['HA', ]
-        routes = filter(lambda route: route['company_three'] in routes_available, routes)
+        #routes_available = ['HA', ]
+        #routes = filter(lambda route: route['company_three'] in routes_available, routes)
 
         return json_response({
             "hotels": hotels[:page_size],
