@@ -85,7 +85,7 @@ class CommodityProduct(models.Model):
         verbose_name = verbose_name_plural = u"所有目的地商品"
 
     def __unicode__(self):
-        return "%s: %s %s" % (self.name, self.city, self.check_in_time)
+        return "%s: %s" % (self.name, self.city)
 
     inventory = models.ForeignKey(CommodityInventory, verbose_name=u"库存", editable=False, related_name="products")
     name = models.CharField(u"商品名", max_length=const.DB_NORMAL_LENGTH)
